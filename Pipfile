@@ -1,0 +1,47 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"boto3" = "*"
+psycopg2 = "*"
+marshmallow-enum = "*"
+Flask = "*"
+Flask-Cors = "*"
+SQLAlchemy = "*"
+Werkzeug = "*"
+Flask-Script = "*"
+marshmallow = "==3.0.0rc5"
+flask-rest-api = "*"
+marshmallow-sqlalchemy = "*"
+pytest-factoryboy = "*"
+requests = "*"
+pytest-sqlalchemy = "*"
+furl = "*"
+
+[dev-packages]
+"flake8" = "*"
+pytest = "*"
+mypy = "*"
+"flake8-mypy" = {ref = "27f1888d7e6766d1b4357cb7a2ecede4bc95b281", git = "https://github.com/jetbridge/flake8-mypy.git"}
+importmagic = "*"
+epc = "*"
+pytest-xdist = "*"
+watchdog = "*"
+pytest-postgresql = "*"
+pudb = "*"
+ipdb = "*"
+mypy_extensions = ">=0.4.1"
+Faker = "*"
+autoflake = "*"
+"python-language-server[all]" = "*"
+yapf = "*"
+pytest-sqlalchemy = "*"
+yaspin = "*"
+
+[requires]
+python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
