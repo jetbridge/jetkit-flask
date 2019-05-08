@@ -3,7 +3,8 @@ from jb.db import TSTZ, Upsertable, Base
 from sqlalchemy import Date, Text, Column, Enum as SQLAEnum
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
-# from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declared_attr
 
 
 @unique
@@ -30,7 +31,9 @@ class User(Base, Upsertable):
     phone_number = Column(Text())
     _password = Column(Text())
 
-    # assets = relationship('Asset', back_populates='createdby')
+    @declared_attr
+    def assets(cls):
+        return relationship('Asset', back_populates='createdby')
 
     @hybrid_property
     def password(self):

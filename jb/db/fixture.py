@@ -5,12 +5,17 @@ from pytest_factoryboy import register
 from yaspin import yaspin
 
 from jb.db import Session
-from jb.model.user import User
+from jb.model.user import User as UserBase
 from jb.model.asset import Asset
 
 faker: FakerFactory = FakerFactory.create()
 faker.seed(420)  # for reproducibility
 session = Session()
+
+
+# create a concrete class of UserBase
+class User(UserBase):
+    __tablename__ = 'person'
 
 
 def seed_db():

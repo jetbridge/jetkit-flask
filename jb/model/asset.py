@@ -22,7 +22,6 @@ log = logging.getLogger(__name__)
 
 
 class AssetStatus(enum.Enum):
-
     added = 'added'
     in_progress = 'in_progress'
     completed = 'completed'
