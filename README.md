@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/jetbridge/backend-core.svg?style=svg)](https://circleci.com/gh/jetbridge/backend-core)
+
 JetBridge Python Core Library
 -----------------------------
 
