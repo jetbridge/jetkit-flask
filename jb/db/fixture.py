@@ -39,4 +39,5 @@ class AssetFactory(factory.Factory):
 
     s3bucket = factory.Sequence(lambda n: f'{faker.word()}{n}')
     s3key = factory.Sequence(lambda n: f'{faker.word()}{n}')
+    mime_type = factory.Sequence(lambda n: f'{faker.word()}{n}')
     createdby = factory.SubFactory(UserFactory)

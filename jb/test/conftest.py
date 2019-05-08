@@ -10,7 +10,6 @@ LOCALE = "en_US"
 
 register(UserFactory, "user", user_type=UserType.normal)
 register(UserFactory, "admin", user_type=UserType.admin)
-
 register(AssetFactory)
 
 
