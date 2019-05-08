@@ -4,7 +4,7 @@ with open('README.md') as f:
     long_description = f.read()
 
 setup(
-    name='JetBridge Core',
+    name='jetbridge-core',
     version='1.0',
     url='https://github.com/jetbridge/backend-core',
     license='ABRMS',
