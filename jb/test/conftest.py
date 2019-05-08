@@ -3,13 +3,13 @@ import pytest
 from flask import Flask
 from pytest_factoryboy import register
 from jb.db.fixture import UserFactory, AssetFactory
-from jb.model.user import UserType
+from jb.model.user import CoreUserType
 
 # for faker
 LOCALE = "en_US"
 
-register(UserFactory, "user", user_type=UserType.normal)
-register(UserFactory, "admin", user_type=UserType.admin)
+register(UserFactory, "user", user_type=CoreUserType.normal)
+register(UserFactory, "admin", user_type=CoreUserType.admin)
 register(AssetFactory)
 
 
