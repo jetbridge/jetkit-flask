@@ -15,6 +15,7 @@ class CoreUserType(Enum):
 
 class User(Base, Upsertable):
     __abstract__ = True
+    __has_assets__ = False  # set to true to enable assets
 
     # polymorphism
     _user_type = Column(SQLAEnum(CoreUserType), nullable=False, server_default=CoreUserType.normal.value)
@@ -33,6 +34,9 @@ class User(Base, Upsertable):
 
     @declared_attr
     def assets(cls):
+        """Add asset relationship if it's been enabled."""
+        if not cls.__has_assets__:
+            return
         return relationship('Asset', back_populates='createdby')
 
     @hybrid_property
