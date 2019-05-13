@@ -1,4 +1,4 @@
-"""Asset model - physical files stored on AWS S3."""
+"""Asset model - files stored on AWS S3."""
 import base64
 import enum
 

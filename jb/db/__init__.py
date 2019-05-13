@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import DateTime, Integer, func, Column, create_engine
+from sqlalchemy import DateTime, Integer, func, Column, create_engine, Boolean
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from typing import List, Any, Dict
@@ -17,6 +17,7 @@ class DeclarativeBase(object):
     id = Column(Integer, primary_key=True)
     created = Column(TSTZ, nullable=False, server_default=func.now())
     updated = Column(TSTZ, nullable=True, onupdate=func.now())
+    is_deleted = Column(Boolean, nullable=False, server_default="false")
 
 
 Base = declarative_base(cls=DeclarativeBase, metaclass=DefaultMeta, class_registry=class_registry)
