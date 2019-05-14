@@ -4,6 +4,7 @@ import sqlalchemy as sa
 
 import pytest
 from faker import Faker
+from flask_jwt_extended import create_access_token, create_refresh_token
 from jb.db.fixture import AssetFactory, UserFactory
 from jb.model.user import CoreUserType
 from jb.test.app import create_app
@@ -74,17 +75,21 @@ def client_unauthenticated(app):
 
 
 @pytest.fixture
-def client(app):
+def client(app, user, session):
     # app.config['TESTING'] = True
 
+    session.add(user)
+    session.commit()
     # get flask test client
     client = app.test_client()
 
-    # TODO: generate access token
-    access_token = "BOGUS"
+    # create access token for the first DB user (fixture `users`)
+    access_token = create_access_token(identity=user.id)
+    refresh_token = create_refresh_token(identity=user.id)
 
     # set environ http header to authenticate user
     client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {access_token}"
+    client.environ_base["REFRESH_TOKEN"] = f"Bearer {refresh_token}"
 
     return client
 

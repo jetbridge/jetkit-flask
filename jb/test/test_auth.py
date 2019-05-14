@@ -20,16 +20,9 @@ def test_models(user, client_unauthenticated, session, api_auth):
     assert response.json.get('user').get('id') is not None
 
 
-def test_authentication_check_success(user, client, client_unauthenticated, session, api_auth):
-    session.add(user)
-    session.commit()
-
+def test_authentication_check_success(client, api_auth):
     response = client.get('/api/auth/check')
     # check endpoint response
-    assert response.status_code == 422
-
-    access_token = client_unauthenticated.post('/api/auth/login', json=dict(email=user.email, password=correct_password)).json.get('access_token')
-    response = client.get('/api/auth/check', environ_base={'HTTP_AUTHORIZATION': f'Bearer {access_token}'})
     assert response.status_code == 200
 
     assert get_jwt_identity() is not None
@@ -43,19 +36,14 @@ def test_authentication_check_failure(client):
     assert response.status_code == 401
 
 
-def test_token_refreshing(user, client, session, api_auth, client_unauthenticated):
-    session.add(user)
-    session.commit()
-    tokens = client_unauthenticated.post('/api/auth/login', json=dict(email=user.email, password=correct_password))
-
-    print(tokens)
+def test_token_refreshing(client, user):
     response = client.get('/api/auth/refresh')  # trying to refresh with access token
     assert response.status_code == 422  # [422 UNPROCESSABLE ENTITY] because access token has different format
 
     response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': ''})  # trying to refresh with empty header
     assert response.status_code == 401
 
-    response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': f'Bearer {tokens.json.get("refresh_token")}'})
+    response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': client.environ_base['REFRESH_TOKEN']})
     assert response.status_code == 200
 
     # try to update access token with the new refresh token for authorized user
