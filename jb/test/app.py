@@ -14,7 +14,6 @@ def create_app(config: dict = {}) -> Flask:
     jwt = JWTManager(app)  # noqa F841
 
     db.init_app(app)  # init sqlalchemy
-    app.db = db
 
     @app.teardown_appcontext
     def shutdown_session(exception=None):
