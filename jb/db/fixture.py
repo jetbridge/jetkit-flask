@@ -5,7 +5,6 @@ from jb.db import db
 from jb.test.model.asset import Asset
 from jb.test.model.user import User
 from pytest_factoryboy import register
-from werkzeug.security import generate_password_hash
 from yaspin import yaspin
 
 faker: FakerFactory = FakerFactory.create()
