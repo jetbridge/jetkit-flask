@@ -1,4 +1,3 @@
-from flask_jwt_extended import get_raw_jwt, decode_token, create_refresh_token, create_access_token, get_jwt_identity
 
 correct_password = "super-password"
 incorrect_password = "wrong-password"

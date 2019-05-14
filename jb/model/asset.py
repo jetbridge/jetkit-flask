@@ -195,7 +195,7 @@ class Asset(Model):
             bucket_name = s3.default_bucket()
 
         # check for existing asset with the same s3key
-        asset: Asset = session.query(Asset).filter_by(s3key=s3key, s3bucket=bucket_name).one_or_none()
+        asset: Asset = Asset.query.filter_by(s3key=s3key, s3bucket=bucket_name).one_or_none()
 
         # validate that this key really points to a file in s3
         content_length = None
