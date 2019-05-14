@@ -19,6 +19,7 @@ pytest-factoryboy = "*"
 requests = "*"
 pytest-sqlalchemy = "*"
 furl = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 "flake8" = "*"
@@ -40,6 +41,7 @@ yapf = "*"
 pytest-sqlalchemy = "*"
 yaspin = "*"
 flask-jwt-extended = "*"
+pytest-flask-sqlalchemy = "*"
 
 [requires]
 python_version = "3.7"

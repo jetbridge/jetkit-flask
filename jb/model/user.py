@@ -1,5 +1,5 @@
 from enum import Enum, unique
-from jb.db import TSTZ, Upsertable, Base
+from jb.db import TSTZ, Upsertable, Model
 from sqlalchemy import Date, Text, Column, Enum as SQLAEnum
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -13,7 +13,7 @@ class CoreUserType(Enum):
     admin = 'admin'
 
 
-class User(Base, Upsertable):
+class User(Model, Upsertable):
     __abstract__ = True
     __has_assets__ = False  # set to true to enable assets
 

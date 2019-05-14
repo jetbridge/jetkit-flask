@@ -4,7 +4,6 @@ import enum
 
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, Text
-from jb.db import Session
 from flask import current_app
 import jb.aws.s3 as s3
 import hashlib
@@ -15,7 +14,7 @@ import re
 import logging
 import botocore.exceptions
 from furl import furl
-from jb.db import Base
+from jb.db import Model, db
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ class AssetStatus(enum.Enum):
     errored = 'errored'
 
 
-class Asset(Base):
+class Asset(Model):
     """Keep a record of files that have been uploaded to S3."""
     __abstract__ = True
 
@@ -195,8 +194,6 @@ class Asset(Base):
         if not bucket_name:
             bucket_name = s3.default_bucket()
 
-        session = Session()
-
         # check for existing asset with the same s3key
         asset: Asset = session.query(Asset).filter_by(s3key=s3key, s3bucket=bucket_name).one_or_none()
 
@@ -236,9 +233,9 @@ class Asset(Base):
             )
             if status:
                 asset.status = status
-            session.add(asset)
+            db.session.add(asset)
 
-        session.commit()
+        db.session.commit()
         return asset
 
     def get_hash(self) -> str:

@@ -1,27 +1,24 @@
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import DateTime, Integer, func, Column, create_engine, Boolean
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from typing import List, Any, Dict
 from contextlib import contextmanager
 import logging
-from jb.db.meta import DefaultMeta
+from flask_sqlalchemy import SQLAlchemy
 
 log = logging.getLogger(__name__)
 TSTZ = DateTime(timezone=True)
-class_registry: dict = dict()
 
 
-# our base model
-class DeclarativeBase(object):
+class BaseModel(object):
     id = Column(Integer, primary_key=True)
     created = Column(TSTZ, nullable=False, server_default=func.now())
     updated = Column(TSTZ, nullable=True, onupdate=func.now())
     is_deleted = Column(Boolean, nullable=False, server_default="false")
 
 
-Base = declarative_base(cls=DeclarativeBase, metaclass=DefaultMeta, class_registry=class_registry)
-Session = sessionmaker()
+db = SQLAlchemy(model_class=BaseModel)
+Model = db.Model
 
 
 def configure_session_url(db_url: str):
