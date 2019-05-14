@@ -35,25 +35,30 @@ def test_authentication_check_success(user, client, client_unauthenticated, sess
     assert get_jwt_identity() is not None
 
 
-# def test_authentication_check_failure(client):
-#     # use empty auth header so request should fail as unauthorized
-#     response = client.get('/api/auth/check', environ_base={'HTTP_AUTHORIZATION': ''})
+def test_authentication_check_failure(client):
+    # use empty auth header so request should fail as unauthorized
+    response = client.get('/api/auth/check', environ_base={'HTTP_AUTHORIZATION': ''})
 
-#     # check endpoint response
-#     assert response.status_code == 401
+    # check endpoint response
+    assert response.status_code == 401
 
 
-# def test_token_refreshing(users, client):
-#     response = client.get('/api/auth/refresh')  # trying to refresh with access token
-#     assert response.status_code == 422  # [422 UNPROCESSABLE ENTITY] because access token has different format
+def test_token_refreshing(user, client, session, api_auth, client_unauthenticated):
+    session.add(user)
+    session.commit()
+    tokens = client_unauthenticated.post('/api/auth/login', json=dict(email=user.email, password=correct_password))
 
-#     response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': ''})  # trying to refresh with empty header
-#     assert response.status_code == 401
+    print(tokens)
+    response = client.get('/api/auth/refresh')  # trying to refresh with access token
+    assert response.status_code == 422  # [422 UNPROCESSABLE ENTITY] because access token has different format
 
-#     response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': client.environ_base["REFRESH_TOKEN"]})
-#     assert response.status_code == 200
+    response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': ''})  # trying to refresh with empty header
+    assert response.status_code == 401
 
-#     # try to update access token with the new refresh token for authorized user
-#     correct_refresh_token = create_refresh_token(identity=users[0].id)
-#     response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': f'Bearer {correct_refresh_token}'})
-#     assert response.status_code == 200
+    response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': f'Bearer {tokens.json.get("refresh_token")}'})
+    assert response.status_code == 200
+
+    # try to update access token with the new refresh token for authorized user
+    correct_refresh_token = create_refresh_token(identity=user.id)
+    response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': f'Bearer {correct_refresh_token}'})
+    assert response.status_code == 200
