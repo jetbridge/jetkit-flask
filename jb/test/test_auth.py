@@ -1,11 +1,11 @@
-from flask_jwt_extended import get_raw_jwt, decode_token, create_refresh_token, get_jwt_identity
+from flask_jwt_extended import create_refresh_token, get_jwt_identity
 
 correct_password = "super-password"
 incorrect_password = "wrong-password"
 
 
-def test_models(user, admin, client_unauthenticated, session, api_auth):
-    session.add_all((user, admin))
+def test_models(user, client_unauthenticated, session, api_auth):
+    session.add(user)
     session.commit()
 
     assert user.is_correct_password(correct_password)
