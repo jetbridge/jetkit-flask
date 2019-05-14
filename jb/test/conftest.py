@@ -20,7 +20,7 @@ register(AssetFactory)
 
 # Retrieve a database connection string from the environment
 # should be a DB that doesn't exist
-DB_CONN = os.getenv('TEST_DATABASE_URL', 'postgresql:///jb_core_test')
+DB_CONN = os.getenv('TEST_DATABASE_URL', 'postgresql://localhost/jb_core_test')
 DB_OPTS = sa.engine.url.make_url(DB_CONN).translate_connect_args()
 
 

@@ -1,8 +1,6 @@
-from sqlalchemy import DateTime, Integer, func, Column, create_engine, Boolean
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import DateTime, Integer, func, Column, Boolean
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from typing import List, Any, Dict
-from contextlib import contextmanager
 import logging
 from flask_sqlalchemy import SQLAlchemy
 
@@ -19,30 +17,6 @@ class BaseModel(object):
 
 db = SQLAlchemy(model_class=BaseModel)
 Model = db.Model
-
-
-def configure_session_url(db_url: str):
-    engine = create_engine(db_url, echo=True)
-    configure_session_engine(engine)
-
-
-def configure_session_engine(engine):
-    Session.configure(bind=engine)
-
-
-@contextmanager
-def session_scope(Session=sessionmaker):
-    """Provide a transactional scope around a series of operations."""
-    session = Session()
-    try:
-        yield session
-        session.commit()
-    except Exception as ex:
-        log.debug(f"DB exception: {ex}")
-        session.rollback()
-        raise
-    finally:
-        session.close()
 
 
 # model mixin
