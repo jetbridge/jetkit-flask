@@ -2,11 +2,10 @@
 import base64
 import enum
 
-from sqlalchemy.sql.schema import Column, ForeignKey
+from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, Text
 from jb.db import Session
 from flask import current_app
-from sqlalchemy.orm import relationship
 import jb.aws.s3 as s3
 import hashlib
 import os.path
@@ -30,10 +29,7 @@ class AssetStatus(enum.Enum):
 
 class Asset(Base):
     """Keep a record of files that have been uploaded to S3."""
-    createdby_user_id = Column(Integer,
-                               ForeignKey('person.id', name="createdby_user_fk", use_alter=True),
-                               nullable=True)
-    createdby = relationship('User', back_populates='assets', foreign_keys=[createdby_user_id], uselist=False)
+    __abstract__ = True
 
     s3bucket = Column(Text, nullable=False)
     s3key = Column(Text, nullable=False)

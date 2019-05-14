@@ -5,17 +5,12 @@ from pytest_factoryboy import register
 from yaspin import yaspin
 
 from jb.db import Session
-from jb.model.user import User as UserBase
-from jb.model.asset import Asset
+from jb.test.model.user import User
+from jb.test.model.asset import Asset
 
 faker: FakerFactory = FakerFactory.create()
 faker.seed(420)  # for reproducibility
 session = Session()
-
-
-# create a concrete class of UserBase
-class User(UserBase):
-    __tablename__ = 'person'
 
 
 def seed_db():
@@ -45,4 +40,4 @@ class AssetFactory(factory.Factory):
     s3bucket = factory.Sequence(lambda n: f'{faker.word()}{n}')
     s3key = factory.Sequence(lambda n: f'{faker.word()}{n}')
     mime_type = factory.Sequence(lambda n: f'{faker.word()}{n}')
-    createdby = factory.SubFactory(UserFactory)
+    owner = factory.SubFactory(UserFactory)

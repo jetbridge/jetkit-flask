@@ -27,12 +27,6 @@ class CoreUserSchema(Schema):
     phone_number = f.String()
 
 
-class AuthResponse(Schema):
-    access_token = f.String()
-    refresh_token = f.String()
-    user = f.Nested(CoreUserSchema)
-
-
 class RefreshTokenResponse(Schema):
     access_token = f.String()
 
@@ -67,33 +61,36 @@ def auth_response_for_user(user: AuthModel) -> dict:
     }
 
 
-class CoreAuth:
-    auth_model: AuthModel
+def CoreAuthAPI(auth_model: AuthModel, user_schema: Schema = CoreUserSchema):
+    class AuthResponse(Schema):
+        access_token = f.String(dump_only=True)
+        refresh_token = f.String(dump_only=True)
+        user = f.Nested(user_schema)
 
-    @classmethod
-    def login(cls, email: str, password: str):
+    @blp.route('login', methods=['POST'])
+    @blp.response(AuthResponse)
+    @blp.arguments(LoginRequest, as_kwargs=True)
+    def login(email: str, password: str):
         """Login with email + password."""
         # session = Session()
-
         cleaned_email = email.strip().lower()
-        user: AuthModel = cls.auth_model.query\
-                                        .filter_by(email=cleaned_email).one_or_none()
+        user: AuthModel = auth_model.query\
+                                    .filter_by(email=cleaned_email).one_or_none()
         if not user or not user.password or not user.is_correct_password(password):
             abort(401, message="Wrong user name or password")
         return auth_response_for_user(user)
 
-    @classmethod
+    @blp.route('check', methods=['GET'])
     @jwt_required
-    @blp.response(schema=None, code=401, description="Invalid access token.")
-    def check_user(cls):
+    def check_user():
         """Check if current access token is valid."""
         return "ok"
 
     # endpoint is reachable only if refresh_token is present and valid
     # access_token itself doesn't provide access to this endpoint
-    @classmethod
+    @blp.route('refresh', methods=['GET'])
     @jwt_refresh_token_required
     @blp.response(RefreshTokenResponse)
-    def refresh_tokens(cls):
+    def refresh_tokens():
         """Generate new tokens if current user has valid refresh token"""
         return refresh_token_response(get_jwt_identity())
