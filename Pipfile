@@ -24,7 +24,7 @@ furl = "*"
 "flake8" = "*"
 pytest = "*"
 mypy = "*"
-"flake8-mypy" = {ref = "27f1888d7e6766d1b4357cb7a2ecede4bc95b281", git = "https://github.com/jetbridge/flake8-mypy.git"}
+flake8-mypy = {ref = "27f1888d7e6766d1b4357cb7a2ecede4bc95b281",git = "https://github.com/jetbridge/flake8-mypy.git"}
 importmagic = "*"
 epc = "*"
 pytest-xdist = "*"
@@ -39,6 +39,7 @@ autoflake = "*"
 yapf = "*"
 pytest-sqlalchemy = "*"
 yaspin = "*"
+flask-jwt-extended = "*"
 
 [requires]
 python_version = "3.7"

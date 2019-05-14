@@ -1,12 +1,12 @@
 """Create fake models for tests and seeding dev DB."""
 import factory
 from faker import Factory as FakerFactory
-from pytest_factoryboy import register
-from yaspin import yaspin
-
 from jb.db import Session
-from jb.test.model.user import User
 from jb.test.model.asset import Asset
+from jb.test.model.user import User
+from pytest_factoryboy import register
+from werkzeug.security import generate_password_hash
+from yaspin import yaspin
 
 faker: FakerFactory = FakerFactory.create()
 faker.seed(420)  # for reproducibility
@@ -30,6 +30,7 @@ class UserFactory(factory.Factory):
     email = factory.Sequence(lambda n: f'user{n}@example.com')
     dob = factory.LazyAttribute(lambda x: faker.simple_profile()['birthdate'])
     name = factory.LazyAttribute(lambda x: faker.name())
+    _password = factory.LazyAttribute(lambda x: generate_password_hash('super-password'))
 
 
 @register
