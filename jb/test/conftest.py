@@ -4,7 +4,8 @@ from pytest_factoryboy import register
 from jb.db.fixture import UserFactory, AssetFactory
 from jb.model.user import CoreUserType
 import os
-from jb.test.app import create_app
+from jb.test.app import create_app, api_auth
+from sqlalchemy.orm import sessionmaker as sqla_sessionmaker
 
 
 # for faker
@@ -19,23 +20,23 @@ register(AssetFactory)
 def app():
     """Create a Flask app context for tests."""
     app = create_app()
-    # from ..views import register_blueprints
-    # from ..api import api
-
-    # api.init_app(app)
-
-    # for blp in register_blueprints:
-    #     api.register_blueprint(blp)
-
     with app.app_context():
         yield app
 
 @pytest.fixture
 def session(app, dbsession, engine):
+    """Get session for current test."""
     import jb.model  # noqa: F401
+    import jb.model.user  # noqa: F401
     from jb.db import Base
     Base.metadata.create_all(engine)
     return dbsession
+
+
+@pytest.fixture(scope='session')
+def sessionmaker(engine):
+    """Get a sessionmaker that is bound to the test database engine."""
+    return sqla_sessionmaker(bind=engine)
 
 
 @pytest.fixture

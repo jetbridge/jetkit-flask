@@ -4,7 +4,7 @@ correct_password = "super-password"
 incorrect_password = "wrong-password"
 
 
-def test_models(user, admin, client_unauthenticated, session):
+def test_models(user, admin, client_unauthenticated, session, api_auth):
     session.add_all((user, admin))
     session.commit()
 

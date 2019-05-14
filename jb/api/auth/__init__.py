@@ -4,6 +4,8 @@ from marshmallow import fields as f, Schema
 from flask_jwt_extended import jwt_required, jwt_refresh_token_required, create_access_token, create_refresh_token, get_jwt_identity
 from abc import abstractmethod
 from sqlalchemy.orm import Query
+from jb.db import Session as CoreSession, session_scope
+from typing import Callable
 
 blp = Blueprint(
     'Authentication',
@@ -61,7 +63,9 @@ def auth_response_for_user(user: AuthModel) -> dict:
     }
 
 
-def CoreAuthAPI(auth_model: AuthModel, user_schema: Schema = CoreUserSchema):
+def CoreAuthAPI(auth_model: AuthModel,
+                Session: Callable = CoreSession,
+                user_schema: Schema = CoreUserSchema):
     class AuthResponse(Schema):
         access_token = f.String(dump_only=True)
         refresh_token = f.String(dump_only=True)
@@ -72,13 +76,13 @@ def CoreAuthAPI(auth_model: AuthModel, user_schema: Schema = CoreUserSchema):
     @blp.arguments(LoginRequest, as_kwargs=True)
     def login(email: str, password: str):
         """Login with email + password."""
-        # session = Session()
-        cleaned_email = email.strip().lower()
-        user: AuthModel = auth_model.query\
-                                    .filter_by(email=cleaned_email).one_or_none()
-        if not user or not user.password or not user.is_correct_password(password):
-            abort(401, message="Wrong user name or password")
-        return auth_response_for_user(user)
+        with session_scope(Session) as session:
+            cleaned_email = email.strip().lower()
+            user: AuthModel = session.query(auth_model)\
+                                     .filter_by(email=cleaned_email).one_or_none()
+            if not user or not user.password or not user.is_correct_password(password):
+                abort(401, message="Wrong user name or password")
+            return auth_response_for_user(user)
 
     @blp.route('check', methods=['GET'])
     @jwt_required
