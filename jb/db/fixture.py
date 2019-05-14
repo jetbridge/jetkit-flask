@@ -11,6 +11,8 @@ from yaspin import yaspin
 faker: FakerFactory = FakerFactory.create()
 faker.seed(420)  # for reproducibility
 
+password = 'super-password'
+
 
 def seed_db():
     with yaspin(text="Seeding database...", color="yellow") as spinner:
@@ -29,7 +31,7 @@ class UserFactory(factory.Factory):
     email = factory.Sequence(lambda n: f'user{n}@example.com')
     dob = factory.LazyAttribute(lambda x: faker.simple_profile()['birthdate'])
     name = factory.LazyAttribute(lambda x: faker.name())
-    _password = factory.LazyAttribute(lambda x: generate_password_hash('super-password'))
+    password = password
 
 
 @register

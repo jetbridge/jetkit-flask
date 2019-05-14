@@ -1,6 +1,6 @@
 from flask_jwt_extended import create_refresh_token, get_jwt_identity
+from jb.db.fixture import password as correct_password
 
-correct_password = "super-password"
 incorrect_password = "wrong-password"
 
 
