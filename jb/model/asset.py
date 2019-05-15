@@ -14,7 +14,7 @@ import re
 import logging
 import botocore.exceptions
 from furl import furl
-from jb.db import Model, db
+from jb.db import db, BaseModel
 
 log = logging.getLogger(__name__)
 
@@ -26,10 +26,8 @@ class AssetStatus(enum.Enum):
     errored = 'errored'
 
 
-class Asset(Model):
+class Asset(BaseModel):
     """Keep a record of files that have been uploaded to S3."""
-    __abstract__ = True
-
     s3bucket = Column(Text, nullable=False)
     s3key = Column(Text, nullable=False)
 
