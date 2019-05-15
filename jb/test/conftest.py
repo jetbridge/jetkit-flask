@@ -81,7 +81,7 @@ def app(database):
 
 
 @pytest.fixture(scope='session')
-def _db(app):
+def _db():
     """Provide the transactional fixtures with access to the database via a Flask-SQLAlchemy database connection."""
     from jb.db import db
 
@@ -101,10 +101,11 @@ def client_unauthenticated(app):
 def client(app, user, db_session):
     # app.config['TESTING'] = True
 
-    db_session.add(user)
-    db_session.commit()
     # get flask test client
     client = app.test_client()
+
+    db_session.add(user)
+    db_session.commit()
 
     # create access token for the first DB user (fixture `users`)
     access_token = create_access_token(identity=user.id)
@@ -120,3 +121,9 @@ def client(app, user, db_session):
 @pytest.fixture
 def faker():
     return Faker(LOCALE)
+
+
+@pytest.fixture(autouse=True)
+def session(db_session):
+    """Make DB state fresh before every test"""
+    yield db_session
