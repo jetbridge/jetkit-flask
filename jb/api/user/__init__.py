@@ -1,10 +1,8 @@
-from flask_rest_api import Blueprint, abort
-from marshmallow import fields as f, Schema
 from flask_jwt_extended import jwt_required
-from abc import abstractmethod
-from sqlalchemy.orm import Query
-
+from flask_rest_api import Blueprint
 from jb.model.user import CoreUser as User
+from marshmallow import Schema
+
 from .schema import UserSchema
 
 blp = Blueprint(
