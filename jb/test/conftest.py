@@ -3,17 +3,47 @@ import os
 import sqlalchemy as sa
 
 import pytest
-from faker import Faker
+from jb.test.model.user import User
+from jb.test.model.asset import Asset
+from pytest_factoryboy import register
 from flask_jwt_extended import create_access_token, create_refresh_token
-from jb.db.fixture import AssetFactory, UserFactory
 from jb.model.user import CoreUserType
 from jb.test.app import create_app
 from pytest_factoryboy import register
 from pytest_postgresql.factories import (drop_postgresql_database, init_postgresql_database)
 from jb.test.app import api_auth  # noqa: F401
+import factory
+from faker import Factory as FakerFactory
+from pytest_factoryboy import register  # noqa: F401
 
 # for faker
 LOCALE = "en_US"
+
+db_faker: FakerFactory = FakerFactory.create()
+db_faker.seed(420)  # for reproducibility
+
+password = 'super-password'
+
+
+class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    email = factory.Sequence(lambda n: f'user{n}@example.com')
+    dob = factory.LazyAttribute(lambda x: db_faker.simple_profile()['birthdate'])
+    name = factory.LazyAttribute(lambda x: db_faker.name())
+    password = password
+
+
+@register
+class AssetFactory(factory.Factory):
+    class Meta:
+        model = Asset
+
+    s3bucket = factory.Sequence(lambda n: f'{db_faker.word()}{n}')
+    s3key = factory.Sequence(lambda n: f'{db_faker.word()}{n}')
+    mime_type = factory.Sequence(lambda n: f'{db_faker.word()}{n}')
+    owner = factory.SubFactory(UserFactory)
 
 register(UserFactory, "user", user_type=CoreUserType.normal)
 register(UserFactory, "admin", user_type=CoreUserType.admin)
@@ -64,22 +94,17 @@ def _db(app):
 
 
 @pytest.fixture
-def session(_db):
-    yield _db.session
-
-
-@pytest.fixture
 def client_unauthenticated(app):
     # app.config['TESTING'] = True
     return app.test_client()
 
 
 @pytest.fixture
-def client(app, user, session):
+def client(app, user, db_session):
     # app.config['TESTING'] = True
 
-    session.add(user)
-    session.commit()
+    db_session.add(user)
+    db_session.commit()
     # get flask test client
     client = app.test_client()
 
