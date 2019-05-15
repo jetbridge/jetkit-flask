@@ -1,51 +1,22 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import DateTime, Integer, func, Column, create_engine, Boolean
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import DateTime, Integer, func, Column, Boolean
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from typing import List, Any, Dict
-from contextlib import contextmanager
 import logging
-from jb.db.meta import DefaultMeta
+from flask_sqlalchemy import SQLAlchemy
 
 log = logging.getLogger(__name__)
 TSTZ = DateTime(timezone=True)
-class_registry: dict = dict()
 
 
-# our base model
-class DeclarativeBase(object):
+class BaseModel(object):
     id = Column(Integer, primary_key=True)
     created = Column(TSTZ, nullable=False, server_default=func.now())
     updated = Column(TSTZ, nullable=True, onupdate=func.now())
     is_deleted = Column(Boolean, nullable=False, server_default="false")
 
 
-Base = declarative_base(cls=DeclarativeBase, metaclass=DefaultMeta, class_registry=class_registry)
-Session = sessionmaker()
-
-
-def configure_session_url(db_url: str):
-    engine = create_engine(db_url, echo=True)
-    configure_session_engine(engine)
-
-
-def configure_session_engine(engine):
-    Session.configure(bind=engine)
-
-
-@contextmanager
-def session_scope():
-    """Provide a transactional scope around a series of operations."""
-    session = Session()
-    try:
-        yield session
-        session.commit()
-    except Exception as ex:
-        log.debug(f"DB exception: {ex}")
-        session.rollback()
-        raise
-    finally:
-        session.close()
+db = SQLAlchemy(model_class=BaseModel)
+Model = db.Model
 
 
 # model mixin

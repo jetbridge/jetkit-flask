@@ -1,6 +1,5 @@
 from flask_rest_api import Blueprint, abort
 from marshmallow import fields as f, Schema
-# from jb.db import Session
 from flask_jwt_extended import jwt_required, jwt_refresh_token_required, create_access_token, create_refresh_token, get_jwt_identity
 from abc import abstractmethod
 from sqlalchemy.orm import Query
@@ -72,7 +71,6 @@ def CoreAuthAPI(auth_model: AuthModel, user_schema: Schema = CoreUserSchema):
     @blp.arguments(LoginRequest, as_kwargs=True)
     def login(email: str, password: str):
         """Login with email + password."""
-        # session = Session()
         cleaned_email = email.strip().lower()
         user: AuthModel = auth_model.query\
                                     .filter_by(email=cleaned_email).one_or_none()

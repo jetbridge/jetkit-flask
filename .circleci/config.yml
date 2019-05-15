@@ -5,6 +5,7 @@ jobs:
       - image: circleci/python:3.7.1
         environment:
           PIPENV_VENV_IN_PROJECT: true
+          TEST_DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=disable
       - image: circleci/postgres:11-alpine-postgis
         environment:
           POSTGRES_USER: postgres
@@ -28,7 +29,9 @@ jobs:
       - run:
           command: |
             mkdir test-reports
-            pipenv run pytest --junitxml=test-reports/junit.xml --sqlalchemy-connect-url=postgresql://postgres:circle@localhost/core_test?sslmode=disable
-            pipenv run flake8
-      - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+            pipenv run pytest --junitxml=test-reports/junit.xml
+      - store_test_results:
           path: test-reports
+      - run:
+          command: |
+            pipenv run flake8
