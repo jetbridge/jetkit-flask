@@ -1,6 +1,6 @@
-def test_models(user, admin, asset, session):
-    session.add_all((user, admin, asset))
-    session.commit()
+def test_models(user, admin, asset, db_session):
+    db_session.add_all((user, admin, asset))
+    db_session.commit()
     assert user.id
     assert admin.id
     assert asset.id

@@ -1,12 +1,12 @@
 from flask_jwt_extended import create_refresh_token, get_jwt_identity
-from jb.db.fixture import password as correct_password
+from .conftest import password as correct_password
 
 incorrect_password = "wrong-password"
 
 
-def test_models(user, client_unauthenticated, session, api_auth):
-    session.add(user)
-    session.commit()
+def test_models(user, client_unauthenticated, db_session, api_auth):
+    db_session.add(user)
+    db_session.commit()
 
     assert user.is_correct_password(correct_password)
     assert not user.is_correct_password(user.password)  # should fail due to comparing hash with string

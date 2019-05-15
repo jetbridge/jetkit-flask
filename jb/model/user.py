@@ -1,11 +1,10 @@
 from enum import Enum, unique
-from jb.db import TSTZ, Upsertable, Model
+from jb.db import TSTZ, Upsertable,  BaseModel
 from sqlalchemy import Date, Text, Column, Enum as SQLAEnum
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
-
 
 @unique
 class CoreUserType(Enum):
@@ -13,8 +12,7 @@ class CoreUserType(Enum):
     admin = 'admin'
 
 
-class User(Model, Upsertable):
-    __abstract__ = True
+class CoreUser(BaseModel, Upsertable):
     __has_assets__ = False  # set to true to enable assets
 
     # polymorphism
@@ -24,7 +22,6 @@ class User(Model, Upsertable):
     }
 
     email = Column(Text(), unique=True, nullable=True)
-    email_validated = Column(TSTZ)
 
     dob = Column(Date())
     name = Column(Text())
@@ -60,14 +57,14 @@ class User(Model, Upsertable):
         self._user_type = user_type
 
 
-class NormalUser(User):
+class NormalUser(CoreUser):
     __abstract__ = True
     __mapper_args__ = {
         'polymorphic_identity': CoreUserType.normal,
     }
 
 
-class AdminUser(User):
+class AdminUser(CoreUser):
     __abstract__ = True
     __mapper_args__ = {
         'polymorphic_identity': CoreUserType.admin,
