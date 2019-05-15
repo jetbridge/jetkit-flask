@@ -1,20 +1,19 @@
 import os
 
-import sqlalchemy as sa
-
+import factory
 import pytest
-from jb.test.model.user import User
-from jb.test.model.asset import Asset
-from pytest_factoryboy import register
+import sqlalchemy as sa
+from faker import Factory as FakerFactory
+from faker import Faker
 from flask_jwt_extended import create_access_token, create_refresh_token
 from jb.model.user import CoreUserType
-from jb.test.app import create_app
-from pytest_factoryboy import register
-from pytest_postgresql.factories import (drop_postgresql_database, init_postgresql_database)
 from jb.test.app import api_auth  # noqa: F401
-import factory
-from faker import Factory as FakerFactory
+from jb.test.app import create_app
+from jb.test.model.asset import Asset
+from jb.test.model.user import User
 from pytest_factoryboy import register  # noqa: F401
+from pytest_postgresql.factories import (drop_postgresql_database,
+                                         init_postgresql_database)
 
 # for faker
 LOCALE = "en_US"
@@ -35,7 +34,6 @@ class UserFactory(factory.Factory):
     password = password
 
 
-@register
 class AssetFactory(factory.Factory):
     class Meta:
         model = Asset

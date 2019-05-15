@@ -1,10 +1,11 @@
 from enum import Enum, unique
-from jb.db import TSTZ, Upsertable,  BaseModel
+from jb.db import Upsertable, BaseModel
 from sqlalchemy import Date, Text, Column, Enum as SQLAEnum
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declared_attr
+
 
 @unique
 class CoreUserType(Enum):

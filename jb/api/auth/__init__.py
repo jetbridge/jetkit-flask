@@ -3,7 +3,7 @@ from marshmallow import fields as f, Schema
 from flask_jwt_extended import jwt_required, jwt_refresh_token_required, create_access_token, create_refresh_token, get_jwt_identity
 from abc import abstractmethod
 from sqlalchemy.orm import Query
-from ..user.schema import UserSchema
+from jb.api.user.schema import UserSchema
 
 blp = Blueprint(
     'Authentication',
