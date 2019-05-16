@@ -7,7 +7,7 @@ from faker import Factory as FakerFactory
 from faker import Faker
 from flask_jwt_extended import create_access_token, create_refresh_token
 from jb.model.user import CoreUserType
-from jb.test.app import api_auth  # noqa: F401
+from jb.test.app import api_auth, api_user  # noqa: F401
 from jb.test.app import create_app
 from jb.test.model.asset import Asset
 from jb.test.model.user import User
@@ -98,14 +98,15 @@ def client_unauthenticated(app):
 
 
 @pytest.fixture
-def client(app, user, db_session):
+def client(app, admin, user, db_session):
     # app.config['TESTING'] = True
+
+    db_session.add(user)
+    db_session.add(admin)
+    db_session.commit()
 
     # get flask test client
     client = app.test_client()
-
-    db_session.add(user)
-    db_session.commit()
 
     # create access token for the first DB user (fixture `users`)
     access_token = create_access_token(identity=user.id)
