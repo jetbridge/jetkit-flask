@@ -3,6 +3,7 @@ from marshmallow import fields as f, Schema
 from flask_jwt_extended import jwt_required, jwt_refresh_token_required, create_access_token, create_refresh_token, get_jwt_identity
 from abc import abstractmethod
 from sqlalchemy.orm import Query
+from jb.api.user.schema import UserSchema
 
 blp = Blueprint(
     'Authentication',
@@ -15,15 +16,6 @@ blp = Blueprint(
 class LoginRequest(Schema):
     password = f.String(required=True, allow_none=False)
     email = f.String(required=True, allow_none=False)
-
-
-# FIXME: move to user schemas
-class CoreUserSchema(Schema):
-    id = f.Integer()
-    name = f.String()
-    email = f.String()
-    dob = f.Date()
-    phone_number = f.String()
 
 
 class RefreshTokenResponse(Schema):
@@ -60,7 +52,7 @@ def auth_response_for_user(user: AuthModel) -> dict:
     }
 
 
-def CoreAuthAPI(auth_model: AuthModel, user_schema: Schema = CoreUserSchema):
+def CoreAuthAPI(auth_model: AuthModel, user_schema: Schema = UserSchema):
     class AuthResponse(Schema):
         access_token = f.String(dump_only=True)
         refresh_token = f.String(dump_only=True)

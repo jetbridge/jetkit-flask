@@ -1,19 +1,47 @@
 import os
 
-import sqlalchemy as sa
-
+import factory
 import pytest
+import sqlalchemy as sa
+from faker import Factory as FakerFactory
 from faker import Faker
 from flask_jwt_extended import create_access_token, create_refresh_token
-from jb.db.fixture import AssetFactory, UserFactory
 from jb.model.user import CoreUserType
+from jb.test.app import api_auth, api_user  # noqa: F401
 from jb.test.app import create_app
-from pytest_factoryboy import register
-from pytest_postgresql.factories import (drop_postgresql_database, init_postgresql_database)
-from jb.test.app import api_auth  # noqa: F401
+from jb.test.model.asset import Asset
+from jb.test.model.user import User
+from pytest_factoryboy import register  # noqa: F401
+from pytest_postgresql.factories import (drop_postgresql_database,
+                                         init_postgresql_database)
 
 # for faker
 LOCALE = "en_US"
+
+db_faker: FakerFactory = FakerFactory.create()
+db_faker.seed(420)  # for reproducibility
+
+password = 'super-password'
+
+
+class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    email = factory.Sequence(lambda n: f'user{n}@example.com')
+    dob = factory.LazyAttribute(lambda x: db_faker.simple_profile()['birthdate'])
+    name = factory.LazyAttribute(lambda x: db_faker.name())
+    password = password
+
+
+class AssetFactory(factory.Factory):
+    class Meta:
+        model = Asset
+
+    s3bucket = factory.Sequence(lambda n: f'{db_faker.word()}{n}')
+    s3key = factory.Sequence(lambda n: f'{db_faker.word()}{n}')
+    mime_type = factory.Sequence(lambda n: f'{db_faker.word()}{n}')
+    owner = factory.SubFactory(UserFactory)
 
 register(UserFactory, "user", user_type=CoreUserType.normal)
 register(UserFactory, "admin", user_type=CoreUserType.admin)
@@ -33,9 +61,7 @@ def database(request):
     pg_user = DB_OPTS.get("username")
     pg_db = DB_OPTS["database"]
 
-    db = init_postgresql_database(pg_user, pg_host, pg_port, pg_db)
-
-    yield db
+    init_postgresql_database(pg_user, pg_host, pg_port, pg_db)
 
     @request.addfinalizer
     def drop_database():
@@ -64,22 +90,19 @@ def _db(app):
 
 
 @pytest.fixture
-def session(_db):
-    yield _db.session
-
-
-@pytest.fixture
 def client_unauthenticated(app):
     # app.config['TESTING'] = True
     return app.test_client()
 
 
 @pytest.fixture
-def client(app, user, session):
+def client(app, admin, user, db_session):
     # app.config['TESTING'] = True
 
-    session.add(user)
-    session.commit()
+    db_session.add(user)
+    db_session.add(admin)
+    db_session.commit()
+
     # get flask test client
     client = app.test_client()
 
@@ -97,3 +120,9 @@ def client(app, user, session):
 @pytest.fixture
 def faker():
     return Faker(LOCALE)
+
+
+@pytest.fixture(autouse=True)
+def session(db_session):
+    """Ensure every test is inside a subtransaction giving us a clean slate each test."""
+    yield db_session

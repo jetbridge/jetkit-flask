@@ -22,9 +22,17 @@ def create_app(config: dict = {}) -> Flask:
     return app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def api_auth(app):
     from jb.api.auth import blp, CoreAuthAPI
     from jb.test.model.user import User
     CoreAuthAPI(auth_model=User)
+    app.register_blueprint(blp)
+
+
+@pytest.fixture()
+def api_user(app):
+    from jb.api.user import blp, CoreUserAPI
+    from jb.test.model.user import User
+    CoreUserAPI(user_model=User)
     app.register_blueprint(blp)
