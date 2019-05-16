@@ -13,7 +13,7 @@ blp = Blueprint(
 )
 
 
-# auth model protocol
+# user model protocol
 class UserModel():
     id: int
     query: Query
