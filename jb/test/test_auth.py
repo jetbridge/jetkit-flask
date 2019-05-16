@@ -4,7 +4,7 @@ from .conftest import password as correct_password
 incorrect_password = "wrong-password"
 
 
-def test_models(user, client_unauthenticated, db_session, api_auth):
+def test_login(user, client_unauthenticated, db_session, api_auth):
     db_session.add(user)
     db_session.commit()
 
