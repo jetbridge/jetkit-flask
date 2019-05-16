@@ -63,8 +63,6 @@ def database(request):
 
     db = init_postgresql_database(pg_user, pg_host, pg_port, pg_db)
 
-    yield db
-
     @request.addfinalizer
     def drop_database():
         drop_postgresql_database(pg_user, pg_host, pg_port, pg_db, 9.6)
