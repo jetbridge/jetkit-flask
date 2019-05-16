@@ -45,6 +45,10 @@ class CoreUser(BaseModel, Upsertable):
     def password(self, plaintext):
         self._password = generate_password_hash(plaintext)
 
+    @hybrid_property
+    def user_type(self):
+        return self._user_type
+
     @user_type.setter  # noqa: T484
     # TODO: Any checks before changing the user_type?
     def user_type(self, new_type):
