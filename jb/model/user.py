@@ -46,7 +46,7 @@ class CoreUser(BaseModel, Upsertable):
         self._password = generate_password_hash(plaintext)
 
     @hybrid_property
-    def user_type(self):
+    def user_type(self) -> str:
         return self._user_type
 
     @user_type.setter  # noqa: T484
