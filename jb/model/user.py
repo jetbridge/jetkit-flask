@@ -45,6 +45,11 @@ class CoreUser(BaseModel, Upsertable):
     def password(self, plaintext):
         self._password = generate_password_hash(plaintext)
 
+    @user_type.setter  # noqa: T484
+    # TODO: Any checks before changing the user_type?
+    def user_type(self, new_type):
+        self._user_type = new_type
+
     def is_correct_password(self, plaintext):
         return check_password_hash(self._password, plaintext)
 
