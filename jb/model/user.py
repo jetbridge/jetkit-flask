@@ -46,12 +46,12 @@ class CoreUser(BaseModel, Upsertable):
         self._password = generate_password_hash(plaintext)
 
     @hybrid_property
-    def user_type(self) -> str:
+    def user_type(self) -> CoreUserType:
         return self._user_type
 
     @user_type.setter  # noqa: T484
     # TODO: Any checks before changing the user_type?
-    def user_type(self, new_type):
+    def user_type(self, new_type: CoreUserType):
         self._user_type = new_type
 
     def is_correct_password(self, plaintext):
