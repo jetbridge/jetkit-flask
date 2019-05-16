@@ -61,7 +61,7 @@ def database(request):
     pg_user = DB_OPTS.get("username")
     pg_db = DB_OPTS["database"]
 
-    db = init_postgresql_database(pg_user, pg_host, pg_port, pg_db)
+    init_postgresql_database(pg_user, pg_host, pg_port, pg_db)
 
     @request.addfinalizer
     def drop_database():
@@ -79,7 +79,7 @@ def app(database):
 
 
 @pytest.fixture(scope='session')
-def _db():
+def _db(app):
     """Provide the transactional fixtures with access to the database via a Flask-SQLAlchemy database connection."""
     from jb.db import db
 
