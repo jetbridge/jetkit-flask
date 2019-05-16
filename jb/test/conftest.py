@@ -124,5 +124,5 @@ def faker():
 
 @pytest.fixture(autouse=True)
 def session(db_session):
-    """Make DB state fresh before every test"""
+    """Ensure every test is inside a subtransaction giving us a clean slate each test."""
     yield db_session
