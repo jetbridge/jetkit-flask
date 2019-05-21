@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, Integer, func, Column, Boolean
+from sqlalchemy import DateTime, Integer, func, Column
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from typing import List, Any, Dict
 import logging
@@ -12,7 +12,7 @@ class BaseModel(object):
     id = Column(Integer, primary_key=True)
     created = Column(TSTZ, nullable=False, server_default=func.now())
     updated = Column(TSTZ, nullable=True, onupdate=func.now())
-    is_deleted = Column(Boolean, nullable=False, server_default="false")
+    deleted = Column(TSTZ, nullable=True)
 
 
 db = SQLAlchemy(model_class=BaseModel)
