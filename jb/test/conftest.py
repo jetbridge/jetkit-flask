@@ -107,8 +107,8 @@ def client(app, admin, user, db_session):
     client = app.test_client()
 
     # create access token for the first DB user (fixture `users`)
-    access_token = create_access_token(identity=user.id)
-    refresh_token = create_refresh_token(identity=user.id)
+    access_token = create_access_token(identity=user)
+    refresh_token = create_refresh_token(identity=user)
 
     # set environ http header to authenticate user
     client.environ_base["HTTP_AUTHORIZATION"] = f"Bearer {access_token}"

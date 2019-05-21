@@ -47,6 +47,6 @@ def test_token_refreshing(client, user):
     assert response.status_code == 200
 
     # try to update access token with the new refresh token for authorized user
-    correct_refresh_token = create_refresh_token(identity=user.id)
+    correct_refresh_token = create_refresh_token(identity=user)
     response = client.get('/api/auth/refresh', environ_base={'HTTP_AUTHORIZATION': f'Bearer {correct_refresh_token}'})
     assert response.status_code == 200
