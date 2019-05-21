@@ -43,8 +43,8 @@ def refresh_token_response(user: int) -> dict:
 
 
 def auth_response_for_user(user: AuthModel) -> dict:
-    access_token = create_access_token(identity=user.id)
-    refresh_token = create_refresh_token(identity=user.id)
+    access_token = create_access_token(identity=user)
+    refresh_token = create_refresh_token(identity=user)
     return {
         'access_token': access_token,  # valid for 15 minutes by default
         'refresh_token': refresh_token,  # valid for 30 days by default
