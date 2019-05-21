@@ -1,6 +1,6 @@
 from flask_rest_api import Blueprint, abort
 from marshmallow import fields as f, Schema
-from flask_jwt_extended import jwt_required, jwt_refresh_token_required, create_access_token, create_refresh_token, get_jwt_identity
+from flask_jwt_extended import jwt_required, current_user, jwt_refresh_token_required, create_access_token, create_refresh_token
 from abc import abstractmethod
 from sqlalchemy.orm import Query
 from jb.api.user.schema import UserSchema
@@ -36,7 +36,7 @@ class AuthModel():
         raise NotImplementedError()
 
 
-def refresh_token_response(user: int) -> dict:
+def refresh_token_response(user: AuthModel) -> dict:
     access_token = create_access_token(identity=user)
     refresh_token = create_refresh_token(identity=user)
     return {'access_token': access_token, 'refresh_token': refresh_token}
@@ -83,4 +83,4 @@ def CoreAuthAPI(auth_model: AuthModel, user_schema: Schema = UserSchema):
     @blp.response(RefreshTokenResponse)
     def refresh_tokens():
         """Generate new tokens if current user has valid refresh token"""
-        return refresh_token_response(get_jwt_identity())
+        return refresh_token_response(current_user)
