@@ -20,6 +20,8 @@ var/
 .serverless
 .serverless-wsgi
 
+# Other
+.vscode
 __pycache__
 node_modules
 instance.cfg
