@@ -1,5 +1,5 @@
 def test_users(client, api_user, db_session):
-    response = client.get('/api/users')
+    response = client.get('/api/user')
 
     # check endpoint response
     assert response.status_code == 200
@@ -12,13 +12,13 @@ def test_users(client, api_user, db_session):
 
 
 def test_user_details(client, api_user, db_session, user, admin):
-    response = client.get('/api/users/0')
+    response = client.get('/api/user/0')
     assert response.status_code == 404
 
-    user_response = client.get(f'/api/users/{user.id}')
+    user_response = client.get(f'/api/user/{user.id}')
     assert user_response.status_code == 200
 
-    admin_response = client.get(f'/api/users/{admin.id}')
+    admin_response = client.get(f'/api/user/{admin.id}')
     assert admin_response.status_code == 200
 
     assert user_response.json.get('id')

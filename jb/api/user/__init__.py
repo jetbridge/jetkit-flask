@@ -9,7 +9,7 @@ from .schema import UserSchema
 blp = Blueprint(
     'Users',
     __name__,
-    url_prefix='/api/users',
+    url_prefix='/api/user',
 )
 
 
