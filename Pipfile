@@ -42,6 +42,8 @@ yapf = "*"
 pytest-sqlalchemy = "*"
 yaspin = "*"
 pytest-flask-sqlalchemy = "*"
+black = "*"
+pytest-mock = "*"
 
 [requires]
 python_version = "3.7"
