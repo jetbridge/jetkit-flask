@@ -14,6 +14,11 @@ class BaseModel(object):
     updated = Column(TSTZ, nullable=True, onupdate=func.now())
     deleted = Column(TSTZ, nullable=True)
 
+    def update(self, **kwargs):
+        for attr, value in kwargs.items():
+            if hasattr(self, attr):
+                setattr(self, attr, value)
+
 
 db = SQLAlchemy(model_class=BaseModel)
 Model = db.Model
