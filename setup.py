@@ -1,22 +1,27 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.md') as f:
     long_description = f.read()
 
+NAME = 'jb'
+DESCRIPTION = 'Common reusable code for python projects.'
+VERSION = '1.1.0'
+REQUIRES_PYTHON = '>=3.6.0'
+
 setup(
-    name='jb',
-    version='1.0',
+    name=NAME,
+    version=VERSION,
     url='https://github.com/jetbridge/backend-core',
     license='ABRMS',
     author='JetBridge',
     author_email='mischa@jetbridge.com',
-    description='Common reusable code for python projects.',
+    description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type='text/markdown',
     # py_modules=['jb'],
     # if you would be using a package instead use packages instead
     # of py_modules:
-    packages=['jb'],
+    packages=find_packages(exclude=["test", "*.test", "*.test.*", "test.*"]),
     zip_safe=False,
     include_package_data=True,
     platforms='any',
