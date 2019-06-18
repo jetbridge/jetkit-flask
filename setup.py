@@ -13,10 +13,10 @@ setup(
     description='Common reusable code for python projects.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    py_modules=['jb'],
+    # py_modules=['jb'],
     # if you would be using a package instead use packages instead
     # of py_modules:
-    # packages=['flask_sqlite3'],
+    packages=['jb'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',
