@@ -268,6 +268,14 @@
             ],
             "version": "==19.0"
         },
+        "pdfkit": {
+            "hashes": [
+                "sha256:05f1c631e8d9ab877886955da825e48b459e097886a21448ab17b34c60cfd66c",
+                "sha256:6a866c9659e62a81abd72cdb32b400762d76085b964beb0b15106d573a539677",
+                "sha256:ef1da35b78d534197e7ce4a604a4a190e9aa769e56634957535f3479a50d8cd1"
+            ],
+            "version": "==0.6.1"
+        },
         "pluggy": {
             "hashes": [
                 "sha256:0825a152ac059776623854c1543d65a4ad408eb3d33ee114dff91e57ec6ae6fc",
@@ -386,10 +394,10 @@
         },
         "themis-docs": {
             "hashes": [
-                "sha256:e7bc45ea0942bfafb79b0c3031560974c5d5fc7eb413a6aae1ef7981ba95159d"
+                "sha256:ca58742dd8ad4e7345323de9ae4f3175c5a9228c6296a65410f3ac65426611e5"
             ],
             "index": "pypi",
-            "version": "==0.0.2"
+            "version": "==0.0.3"
         },
         "urllib3": {
             "hashes": [
