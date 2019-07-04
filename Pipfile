@@ -21,6 +21,7 @@ pytest-sqlalchemy = "*"
 furl = "*"
 flask-jwt-extended = "*"
 flask-sqlalchemy = "*"
+themis-docs = "*"
 
 [dev-packages]
 "flake8" = "*"
