@@ -2,6 +2,7 @@
 import base64
 import enum
 
+import boto3
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, Text
 from flask import current_app
@@ -100,7 +101,33 @@ class Asset(BaseModel):
 
     def s3_direct_url(self):
         """Generate S3 URL, assumes this is viewable by the world."""
-        return furl(scheme='https', host=f"{self.s3bucket}.s3.amazonaws.com/{self.s3key}")
+        lastmod = self.updated if self.updated else self.created
+        return furl(
+            scheme="https",
+            host=f"{self.s3bucket}.s3.{self.region}.amazonaws.com",
+            path=f"/{self.s3key}",
+            args={"t": self._dt(lastmod)},
+        )
+
+    def generate_presigned_upload(
+        self, content_type: str = None, expire: int = 86400, acl: s3.ACL = s3.ACL.private
+    ):
+        """Get a S3 presigned URL to upload a file via PUT."""
+        headers = {"x-amz-acl": acl.value}
+
+        # PutObject params
+        put_params = dict(Bucket=self.s3bucket, Key=self.s3key, ACL=acl.value)
+        if content_type:
+            put_params["ContentType"] = content_type
+            headers["content-type"] = content_type
+
+        s3 = boto3.client(
+            "s3", endpoint_url=f"https://s3.{self.region}.amazonaws.com"
+        )
+        url = s3.generate_presigned_url(
+            ClientMethod="put_object", Params=put_params, ExpiresIn=expire
+        )
+        return {"url": url, "headers": headers}
 
     @classmethod
     def _generate_s3_key(cls, directory, file_name, content_type):
@@ -163,7 +190,7 @@ class Asset(BaseModel):
         return asset
 
     @classmethod
-    def create_from_content(cls, *, user, content, content_type, directory=None, s3key: str=None):
+    def create_from_content(cls, *, user, content, content_type, directory=None, s3key: str=None, acl: s3.ACL = s3.ACL.private):
         """Copy file to S3 and return asset."""
         # get S3 key
         if not s3key:
@@ -173,6 +200,7 @@ class Asset(BaseModel):
             s3key,
             content,
             content_type=content_type,
+            acl=acl,
         )
         # create asset row
         asset = cls.create_asset(s3key=s3key, content_type=content_type, status='completed', owner=user)

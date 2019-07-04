@@ -1,7 +1,20 @@
 """Interface to Amazon S3."""
+from enum import unique, Enum
+
 import boto3
 from flask import current_app
 from flask import _app_ctx_stack as stack
+
+
+@unique
+class ACL(Enum):
+    """Who can view this asset.
+
+    Set on S3 object."""
+
+    private = "private"
+    public_read = "public-read"
+
 
 
 def default_bucket():
@@ -9,7 +22,7 @@ def default_bucket():
     return current_app.config.get('AWS_S3_BUCKET_NAME')
 
 
-def upload_file(file_path, content, content_type):
+def upload_file(file_path, content, content_type, acl: ACL = ACL.private):
     """Upload file contents to AWS S3.
 
     :param file_path: name of an uploaded file
@@ -19,7 +32,7 @@ def upload_file(file_path, content, content_type):
     """
     s3 = _connect_to_s3()
 
-    s3.put_object(Bucket=default_bucket(), Key=file_path, Body=content, ContentType=content_type)
+    s3.put_object(Bucket=default_bucket(), Key=file_path, Body=content, ContentType=content_type, ACL=acl)
     return file_path
 
 
