@@ -14,6 +14,7 @@ class BaseModel(object):
     updated = Column(TSTZ, nullable=True, onupdate=func.now())
 
     def update(self, **kwargs):
+        """Set a dictionary of attributes."""
         for attr, value in kwargs.items():
             if hasattr(self, attr):
                 setattr(self, attr, value)

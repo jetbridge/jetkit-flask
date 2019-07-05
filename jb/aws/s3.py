@@ -6,7 +6,7 @@ from flask import _app_ctx_stack as stack
 
 def default_bucket():
     """S3 bucket our current_app is configured to use."""
-    return current_app.config.get('AWS_S3_BUCKET_NAME')
+    return current_app.config.get("AWS_S3_BUCKET_NAME")
 
 
 def upload_file(file_path, content, content_type):
@@ -19,7 +19,9 @@ def upload_file(file_path, content, content_type):
     """
     s3 = _connect_to_s3()
 
-    s3.put_object(Bucket=default_bucket(), Key=file_path, Body=content, ContentType=content_type)
+    s3.put_object(
+        Bucket=default_bucket(), Key=file_path, Body=content, ContentType=content_type
+    )
     return file_path
 
 
@@ -43,7 +45,9 @@ def get_file(file_key, bucket_name=None):
     return s3.get_object(Bucket=bucket_name, Key=file_key)
 
 
-def get_presigned_view_url(bucket, key, content_type='binary/octet-stream', expires_in=86400):
+def get_presigned_view_url(
+    bucket, key, content_type="binary/octet-stream", expires_in=86400
+):
     """Get pre-signed URL for viewing an S3 object.
 
     :param bucket: name of an S3 bucket
@@ -55,13 +59,11 @@ def get_presigned_view_url(bucket, key, content_type='binary/octet-stream', expi
     s3 = _connect_to_s3()
     if not bucket:
         bucket = default_bucket()
-    url = s3.generate_presigned_url(ClientMethod='get_object',
-                                    Params={
-                                        'Bucket': bucket,
-                                        'Key': key,
-                                        'ResponseContentType': content_type
-                                    },
-                                    ExpiresIn=expires_in)
+    url = s3.generate_presigned_url(
+        ClientMethod="get_object",
+        Params={"Bucket": bucket, "Key": key, "ResponseContentType": content_type},
+        ExpiresIn=expires_in,
+    )
 
     return url
 
@@ -77,24 +79,18 @@ def get_presigned_put(key, content_type, expires_in=3600 * 6, bucket_name=None):
     s3 = _connect_to_s3()
     if not bucket_name:
         bucket_name = default_bucket()
-    put_params = dict(
-        Bucket=bucket_name,
-        Key=key,
-        ACL='private',
-    )
+    put_params = dict(Bucket=bucket_name, Key=key, ACL="private")
     if content_type:
-        put_params['ContentType'] = content_type
+        put_params["ContentType"] = content_type
     url = s3.generate_presigned_url(
-        ClientMethod='put_object',
-        Params=put_params,
-        ExpiresIn=expires_in,
+        ClientMethod="put_object", Params=put_params, ExpiresIn=expires_in
     )
-    if current_app.config.get('AWS_S3_ACCELERATION_ENABLED'):
+    if current_app.config.get("AWS_S3_ACCELERATION_ENABLED"):
         # override upload URL to use accelerated s3 upload service
         # acceleration MUST be enabled on the s3 bucket!!!!
         # unfortunately there's no (working) way to configure boto to use this
         # see botocore issue #978 on github
-        url = url.replace(bucket_name + '.s3', bucket_name + '.s3-accelerate')
+        url = url.replace(bucket_name + ".s3", bucket_name + ".s3-accelerate")
     return url
 
 
@@ -111,19 +107,17 @@ def get_presigned_upload(key, content_type, expires_in=3600 * 6, bucket_name=Non
         Bucket=bucket_name,
         Key=key,
         Fields={"Content-Type": content_type},
-        Conditions=[{
-            "Content-Type": content_type
-        }],
+        Conditions=[{"Content-Type": content_type}],
         ExpiresIn=expires_in,
     )
-    url = presigned_post['url']
-    if current_app.config.get('AWS_S3_ACCELERATION_ENABLED'):
+    url = presigned_post["url"]
+    if current_app.config.get("AWS_S3_ACCELERATION_ENABLED"):
         # override upload URL to use accelerated s3 upload service
         # acceleration MUST be enabled on the s3 bucket!!!!
         # unfortunately there's no (working) way to configure boto to use this
         # see botocore issue #978 on github
-        url = url.replace(bucket_name + '.s3', bucket_name + '.s3-accelerate')
-    return url, presigned_post['fields']
+        url = url.replace(bucket_name + ".s3", bucket_name + ".s3-accelerate")
+    return url, presigned_post["fields"]
 
 
 def get_asset_url(asset):
@@ -142,12 +136,14 @@ def _connect_to_s3():
 
     :return The connection to S3 service
     """
-    if stack and stack.top and hasattr(stack.top, 'jetbridge_s3_client'):
-        return getattr(stack.top, 'jetbridge_s3_client')
+    if stack and stack.top and hasattr(stack.top, "jetbridge_s3_client"):
+        return getattr(stack.top, "jetbridge_s3_client")
     session = boto3.session.Session()
-    client = session.client('s3',
-                            aws_access_key_id=current_app.config.get('AWS_ACCESS_KEY_ID'),
-                            aws_secret_access_key=current_app.config.get('AWS_ACCESS_KEY_SECRET'))
+    client = session.client(
+        "s3",
+        aws_access_key_id=current_app.config.get("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=current_app.config.get("AWS_ACCESS_KEY_SECRET"),
+    )
     if stack and stack.top:
-        setattr(stack.top, 'jetbridge_s3_client', client)
+        setattr(stack.top, "jetbridge_s3_client", client)
     return client

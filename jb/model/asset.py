@@ -20,14 +20,15 @@ log = logging.getLogger(__name__)
 
 
 class AssetStatus(enum.Enum):
-    added = 'added'
-    in_progress = 'in_progress'
-    completed = 'completed'
-    errored = 'errored'
+    added = "added"
+    in_progress = "in_progress"
+    completed = "completed"
+    errored = "errored"
 
 
 class Asset(BaseModel):
     """Keep a record of files that have been uploaded to S3."""
+
     s3bucket = Column(Text, nullable=False)
     s3key = Column(Text, nullable=False)
 
@@ -36,7 +37,7 @@ class Asset(BaseModel):
 
     filename = Column(Text, nullable=True)
 
-    views = Column(Integer, nullable=False, server_default='0')
+    views = Column(Integer, nullable=False, server_default="0")
 
     def check_main_type(self, expected_type):
         """Check if main mime type is equal to expected type."""
@@ -49,15 +50,15 @@ class Asset(BaseModel):
 
     def is_video(self):
         """Return true iff asset is video."""
-        return self.check_main_type(expected_type='video')
+        return self.check_main_type(expected_type="video")
 
     def is_image(self):
         """Return true iff asset is image."""
-        return self.check_main_type(expected_type='image')
+        return self.check_main_type(expected_type="image")
 
     def is_pdf(self):
         """Return true iff asset is pdf."""
-        return self.mime_type == 'application/pdf'
+        return self.mime_type == "application/pdf"
 
     def user_can_read(self, user):
         """Check if a user can view this asset.
@@ -68,7 +69,10 @@ class Asset(BaseModel):
         # more cases go here...
         if not user:  # anonymous user
             # can access asset unowned asset from public bucket
-            return self.s3bucket in current_app.config.get('S3_PUBLIC_BUCKETS', []) and self.createdby_user_id is None
+            is_unowned = self.createdby_user_id is None
+            is_in_public_bucket = self.s3bucket in current_app.config.get("S3_PUBLIC_BUCKETS", [])
+            return is_unowned and is_in_public_bucket
+
         return user.id == self.createdby_user_id
 
     def user_can_write(self, user):
@@ -95,12 +99,14 @@ class Asset(BaseModel):
         assert self.s3key, "s3_view_url() called on asset with no s3key set"
         extra = {}
         if self.mime_type:
-            extra['content_type'] = self.mime_type
+            extra["content_type"] = self.mime_type
         return s3.get_presigned_view_url(self.s3bucket, self.s3key, **extra)
 
     def s3_direct_url(self):
         """Generate S3 URL, assumes this is viewable by the world."""
-        return furl(scheme='https', host=f"{self.s3bucket}.s3.amazonaws.com/{self.s3key}")
+        return furl(
+            scheme="https", host=f"{self.s3bucket}.s3.amazonaws.com/{self.s3key}"
+        )
 
     @classmethod
     def _generate_s3_key(cls, directory, file_name, content_type):
@@ -108,8 +114,8 @@ class Asset(BaseModel):
         assert directory
 
         h = hashlib.sha256()
-        h.update(str(random.random()).encode('utf-8'))  # bleh
-        h.update(current_app.config['SECRET_KEY'].encode('utf-8'))
+        h.update(str(random.random()).encode("utf-8"))  # bleh
+        h.update(current_app.config["SECRET_KEY"].encode("utf-8"))
 
         key_name = "{}_original".format(h.hexdigest())
 
@@ -119,7 +125,7 @@ class Asset(BaseModel):
             # use uploaded file extension
             extension = os.path.splitext(file_name)[1]
             # slugify name and prefix it
-            file_name_slug = re.sub(r'[^A-Za-z0-9]', '-', file_name)
+            file_name_slug = re.sub(r"[^A-Za-z0-9]", "-", file_name)
             key_name = file_name_slug + "_" + key_name
         if not extension and content_type:
             # or try to guess from mime type
@@ -154,11 +160,7 @@ class Asset(BaseModel):
         content = upload.read()
         file_name = upload.filename
         s3key = cls._generate_s3_key(directory, file_name, content_type)
-        s3key = s3.upload_file(
-            s3key,
-            content,
-            content_type=content_type,
-        )
+        s3key = s3.upload_file(s3key, content, content_type=content_type)
         asset = cls.create_asset(s3key, content_type, owner, file_name)
         return asset
 
@@ -166,19 +168,27 @@ class Asset(BaseModel):
     def create_from_content(cls, *, user, content, directory, content_type):
         """Copy file to S3 and return asset."""
         # get S3 key
-        s3key = cls._generate_s3_key(directory=directory, file_name='raw', content_type=content_type)
-        # upload to S3
-        s3key = s3.upload_file(
-            s3key,
-            content,
-            content_type=content_type,
+        s3key = cls._generate_s3_key(
+            directory=directory, file_name="raw", content_type=content_type
         )
+        # upload to S3
+        s3key = s3.upload_file(s3key, content, content_type=content_type)
         # create asset row
-        asset = cls.create_asset(s3key=s3key, content_type=content_type, status='completed', owner=user)
+        asset = cls.create_asset(
+            s3key=s3key, content_type=content_type, status="completed", owner=user
+        )
         return asset
 
     @classmethod
-    def create_asset(cls, s3key, content_type, owner=None, filename=None, status=None, bucket_name=None):
+    def create_asset(
+        cls,
+        s3key,
+        content_type,
+        owner=None,
+        filename=None,
+        status=None,
+        bucket_name=None,
+    ):
         """Create an asset record for an S3 file.
 
         :param s3key: s3key which may or may not really exist, depending on status.
@@ -193,14 +203,16 @@ class Asset(BaseModel):
             bucket_name = s3.default_bucket()
 
         # check for existing asset with the same s3key
-        asset: Asset = Asset.query.filter_by(s3key=s3key, s3bucket=bucket_name).one_or_none()
+        asset: Asset = Asset.query.filter_by(
+            s3key=s3key, s3bucket=bucket_name
+        ).one_or_none()
 
         # validate that this key really points to a file in s3
         content_length = None
-        if status != 'added':
+        if status != "added":
             try:
                 s3_file = s3.get_file(s3key, bucket_name=bucket_name)
-                content_length = s3_file['ContentLength']
+                content_length = s3_file["ContentLength"]
             except botocore.exceptions.ClientError as e:
                 # file doesn't exist (most likely)
                 log.error("Got create_asset() call for invalid S3 key {}".format(s3key))
@@ -211,8 +223,11 @@ class Asset(BaseModel):
         if asset:
             if asset.createdby_user_id != owner.id:
                 # ruh roh
-                log.error("{} tried to upload an asset with the same S3 key as an asset owned by {}".format(
-                    owner, asset.createdby))
+                log.error(
+                    "{} tried to upload an asset with the same S3 key as an asset owned by {}".format(
+                        owner, asset.createdby
+                    )
+                )
                 raise ValueError("S3 key is not unique")
             # ok let's update the asset
             asset.mime_type = content_type
@@ -239,14 +254,14 @@ class Asset(BaseModel):
     def get_hash(self) -> str:
         """Get security hash for preventing enumeration."""
         m = hashlib.sha256()
-        m.update(current_app.config['SECRET_KEY'].encode('utf-8'))
+        m.update(current_app.config["SECRET_KEY"].encode("utf-8"))
         m.update(str(self.id).encode("utf-8"))
         hex_ = m.hexdigest()
         return hex_
 
     def file_name_without_type(self):
         """Return file name without type."""
-        parts = self.filename.split('.') if self.filename else []
+        parts = self.filename.split(".") if self.filename else []
         if parts:
             return ".".join(parts)
 
@@ -255,9 +270,13 @@ class Asset(BaseModel):
         """Return asset by id validating with the hash."""
         asset = cls.query.get(asset_id)
         if not asset:
-            log.warning(f"Got invalid asset ID in view endpoint, id={asset_id} hash={asset_hash}")
+            log.warning(
+                f"Got invalid asset ID in view endpoint, id={asset_id} hash={asset_hash}"
+            )
             return None
         if asset.get_hash() != asset_hash:
-            log.info(f"Asset security hash does not match, id={asset_id}, hash={asset_hash}")
+            log.info(
+                f"Asset security hash does not match, id={asset_id}, hash={asset_hash}"
+            )
             return None
         return asset
