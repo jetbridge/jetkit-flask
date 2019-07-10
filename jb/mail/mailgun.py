@@ -31,8 +31,10 @@ class Client:
         body: str = None,
         sender: str = None,
         template: str = None,
-        variables: Dict[str, str] = {},
+        variables: Dict[str, str] = None,
     ) -> Optional[Dict]:
+        variables = variables or {}
+
         if not self.enabled:
             return None
 
