@@ -167,8 +167,7 @@ class Asset(BaseModel):
     @classmethod
     def create_from_content(cls, *, user, content, content_type, directory=None, s3key: str=None):
         """Copy file to S3 and return asset."""
-        # get S3 key
-        if not s3key:
+        if not s3key:  # get S3 key
             s3key = cls._generate_s3_key(directory=directory, file_name='raw', content_type=content_type)
         # upload to S3
         s3key = s3.upload_file(s3key, content, content_type=content_type)
