@@ -2,7 +2,9 @@
 import base64
 import enum
 
-from sqlalchemy.sql.schema import Column
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Text
 from flask import current_app
 import jb.aws.s3 as s3
@@ -39,6 +41,14 @@ class Asset(BaseModel):
 
     views = Column(Integer, nullable=False, server_default="0")
 
+    @declared_attr
+    def user_id(self):
+        return Column(Integer, ForeignKey('user.id', name="owner_user_fk", use_alter=True), nullable=True)
+
+    @declared_attr
+    def owner(self):
+        return relationship('User', back_populates='assets', foreign_keys=[self.user_id], uselist=False)
+    
     def check_main_type(self, expected_type):
         """Check if main mime type is equal to expected type."""
         if not self.mime_type:
@@ -69,20 +79,20 @@ class Asset(BaseModel):
         # more cases go here...
         if not user:  # anonymous user
             # can access asset unowned asset from public bucket
-            is_unowned = self.createdby_user_id is None
+            is_unowned = self.user_id is None
             is_in_public_bucket = self.s3bucket in current_app.config.get("S3_PUBLIC_BUCKETS", [])
             return is_unowned and is_in_public_bucket
 
-        return user.id == self.createdby_user_id
+        return user.id == self.user_id
 
     def user_can_write(self, user):
         """Asset creator can update asset."""
-        return user.id == self.createdby_user_id
+        return user.id == self.user_id
 
     @classmethod
     def filter_query_for_user(cls, query, user):
         """List only assets created by user."""
-        return query.filter(cls.createdby_user_id == user.id)
+        return query.filter(cls.user_id == user.id)
 
     def base64_encoded_external_link(self):
         """Return base64 encoded external link."""
@@ -219,7 +229,7 @@ class Asset(BaseModel):
 
         # upsert
         if asset:
-            if asset.createdby_user_id != owner.id:
+            if asset.user_id != owner.id:
                 # ruh roh
                 log.error(
                     "{} tried to upload an asset with the same S3 key as an asset owned by {}".format(
@@ -234,7 +244,7 @@ class Asset(BaseModel):
         else:
             # ok let's create the asset
             asset = cls(
-                createdby_user_id=owner.id if owner else None,
+                user_id=owner.id if owner else None,
                 s3bucket=bucket_name,
                 s3key=s3key,
                 mime_type=content_type,
