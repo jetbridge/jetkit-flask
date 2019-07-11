@@ -47,7 +47,7 @@ class Asset(BaseModel):
 
     @declared_attr
     def owner(self):
-        return relationship('User', back_populates='assets', foreign_keys=[self.user_id], uselist=False)
+        return relationship('User', foreign_keys=[self.user_id], uselist=False)
     
     def check_main_type(self, expected_type):
         """Check if main mime type is equal to expected type."""
