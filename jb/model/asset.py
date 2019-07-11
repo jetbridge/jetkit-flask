@@ -201,7 +201,7 @@ class Asset(BaseModel):
             bucket_name = s3.default_bucket()
 
         # check for existing asset with the same s3key
-        asset: Asset = Asset.query.filter_by(
+        asset: Asset = cls.query.filter_by(
             s3key=s3key, s3bucket=bucket_name
         ).one_or_none()
 
