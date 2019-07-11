@@ -82,7 +82,7 @@ class Asset(BaseModel):
     @classmethod
     def filter_query_for_user(cls, query, user):
         """List only assets created by user."""
-        return query.filter(Asset.createdby_user_id == user.id)
+        return query.filter(cls.createdby_user_id == user.id)
 
     def base64_encoded_external_link(self):
         """Return base64 encoded external link."""
@@ -201,7 +201,7 @@ class Asset(BaseModel):
             bucket_name = s3.default_bucket()
 
         # check for existing asset with the same s3key
-        asset: Asset = cls.query.filter_by(
+        asset: cls = cls.query.filter_by(
             s3key=s3key, s3bucket=bucket_name
         ).one_or_none()
 
@@ -233,7 +233,7 @@ class Asset(BaseModel):
             asset.s3bucket = bucket_name
         else:
             # ok let's create the asset
-            asset = Asset(
+            asset = cls(
                 createdby_user_id=owner.id if owner else None,
                 s3bucket=bucket_name,
                 s3key=s3key,
