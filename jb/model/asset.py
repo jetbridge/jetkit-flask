@@ -46,7 +46,7 @@ class Asset(BaseModel):
 
     updated = Column(TSTZ, nullable=True, onupdate=func.now())
     s3bucket = Column(Text, nullable=False)
-    s3key = Column(Text, nullable=False)
+    s3key = Column(Text, nullable=True)
 
     mime_type = Column(Text, nullable=False)
     size = Column(Integer, nullable=True)
