@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 NAME = "jb"
 DESCRIPTION = "Common reusable code for python projects."
-VERSION = "1.1.4"
+VERSION = "1.1.5"
 REQUIRES_PYTHON = ">=3.6.0"
 
 setup(
