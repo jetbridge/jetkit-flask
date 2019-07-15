@@ -9,18 +9,18 @@ from sqlalchemy.ext.declarative import declared_attr
 
 @unique
 class CoreUserType(Enum):
-    normal = 'normal'
-    admin = 'admin'
+    normal = "normal"
+    admin = "admin"
 
 
 class CoreUser(BaseModel, Upsertable):
     __has_assets__ = False  # set to true to enable assets
 
     # polymorphism
-    _user_type = Column(SQLAEnum(CoreUserType), nullable=False, server_default=CoreUserType.normal.value)
-    __mapper_args__ = {
-        'polymorphic_on': _user_type,
-    }
+    _user_type = Column(
+        SQLAEnum(CoreUserType), nullable=False, server_default=CoreUserType.normal.value
+    )
+    __mapper_args__ = {"polymorphic_on": _user_type}
 
     email = Column(Text(), unique=True, nullable=True)
 
@@ -35,7 +35,7 @@ class CoreUser(BaseModel, Upsertable):
         """Add asset relationship if it's been enabled."""
         if not cls.__has_assets__:
             return
-        return relationship('Asset', back_populates='createdby')
+        return relationship("Asset", back_populates="createdby")
 
     @hybrid_property
     def password(self):
@@ -58,7 +58,7 @@ class CoreUser(BaseModel, Upsertable):
         return check_password_hash(self._password, plaintext)
 
     def __repr__(self):
-        return f'<User id={self.id} {self.email}>'
+        return f"<User id={self.id} {self.email}>"
 
     def is_user_type(self, user_type: CoreUserType) -> bool:
         return self._user_type in [user_type, user_type.value]
@@ -69,13 +69,9 @@ class CoreUser(BaseModel, Upsertable):
 
 class NormalUser(CoreUser):
     __abstract__ = True
-    __mapper_args__ = {
-        'polymorphic_identity': CoreUserType.normal,
-    }
+    __mapper_args__ = {"polymorphic_identity": CoreUserType.normal}
 
 
 class AdminUser(CoreUser):
     __abstract__ = True
-    __mapper_args__ = {
-        'polymorphic_identity': CoreUserType.admin,
-    }
+    __mapper_args__ = {"polymorphic_identity": CoreUserType.admin}

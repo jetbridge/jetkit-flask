@@ -1,8 +1,6 @@
 """Asset model - files stored on AWS S3."""
 import base64
 import enum
-from typing import Optional
-
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
@@ -59,11 +57,15 @@ class Asset(BaseModel):
 
     @declared_attr
     def user_id(self):
-        return Column(Integer, ForeignKey('user.id', name="owner_user_fk", use_alter=True), nullable=True)
+        return Column(
+            Integer,
+            ForeignKey("user.id", name="owner_user_fk", use_alter=True),
+            nullable=True,
+        )
 
     @declared_attr
     def owner(self):
-        return relationship('User', foreign_keys=[self.user_id], uselist=False)
+        return relationship("User", foreign_keys=[self.user_id], uselist=False)
 
     @classmethod
     def process_event_record(cls, record: dict):
@@ -75,7 +77,9 @@ class Asset(BaseModel):
         s3bucket = s3["bucket"]["name"]
 
         asset = (
-            db.session.query(Asset).filter_by(s3key=s3key, s3bucket=s3bucket).one_or_none()
+            db.session.query(Asset)
+            .filter_by(s3key=s3key, s3bucket=s3bucket)
+            .one_or_none()
         )
         if not asset:
             log.error(
@@ -109,10 +113,14 @@ class Asset(BaseModel):
         return asset
 
     @classmethod
-    def create_from_content(cls, *, user, content, content_type, directory=None, s3key: str = None):
+    def create_from_content(
+        cls, *, user, content, content_type, directory=None, s3key: str = None
+    ):
         """Copy file to S3 and return asset."""
         if not s3key:  # get S3 key
-            s3key = cls._generate_s3_key(directory=directory, file_name='raw', content_type=content_type)
+            s3key = cls._generate_s3_key(
+                directory=directory, file_name="raw", content_type=content_type
+            )
         # upload to S3
         s3key = s3.upload_file(s3key, content, content_type=content_type)
         # create asset row
@@ -123,13 +131,13 @@ class Asset(BaseModel):
 
     @classmethod
     def create_asset(
-            cls,
-            s3key,
-            content_type,
-            owner=None,
-            filename=None,
-            status=None,
-            bucket_name=None,
+        cls,
+        s3key,
+        content_type,
+        owner=None,
+        filename=None,
+        status=None,
+        bucket_name=None,
     ):
         """Create an asset record for an S3 file.
 
@@ -282,7 +290,9 @@ class Asset(BaseModel):
         if not user:  # anonymous user
             # can access asset unowned asset from public bucket
             is_unowned = self.user_id is None
-            is_in_public_bucket = self.s3bucket in current_app.config.get("S3_PUBLIC_BUCKETS", [])
+            is_in_public_bucket = self.s3bucket in current_app.config.get(
+                "S3_PUBLIC_BUCKETS", []
+            )
             return is_unowned and is_in_public_bucket
 
         return user.id == self.user_id

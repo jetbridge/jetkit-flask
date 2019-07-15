@@ -6,28 +6,24 @@ from sqlalchemy.orm import Query
 
 from .schema import UserSchema
 
-blp = Blueprint(
-    'Users',
-    __name__,
-    url_prefix='/api/user',
-)
+blp = Blueprint("Users", __name__, url_prefix="/api/user")
 
 
 # user model protocol
-class UserModel():
+class UserModel:
     id: int
     query: Query
 
 
 def CoreUserAPI(user_model: UserModel, user_schema: Schema = UserSchema):
-    @blp.route('')
+    @blp.route("")
     @blp.response(user_schema(many=True))
     # TODO: protect with @permissions_required
     def get_list():
         """List users."""
         return user_model.query
 
-    @blp.route('<int:user_id>', methods=['GET'])
+    @blp.route("<int:user_id>", methods=["GET"])
     @blp.response(user_schema)
     @jwt_required
     def get_user(user_id: int) -> User:

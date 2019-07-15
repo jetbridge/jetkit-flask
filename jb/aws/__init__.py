@@ -15,7 +15,7 @@ def is_in_aws() -> bool:
 
     Right now only checks if in Lambda.
     """
-    return bool(os.getenv('AWS_EXECUTION_ENV'))
+    return bool(os.getenv("AWS_EXECUTION_ENV"))
 
 
 def get_session():
@@ -27,9 +27,10 @@ def get_session():
         return boto3.session.Session()
 
     from flask import current_app as app
+
     session = boto3.session.Session(
-        aws_access_key_id=app.config.get('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key=app.config.get('AWS_ACCESS_KEY_SECRET'),
-        region_name=app.config.get('AWS_DEFAULT_REGION'),
+        aws_access_key_id=app.config.get("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=app.config.get("AWS_ACCESS_KEY_SECRET"),
+        region_name=app.config.get("AWS_DEFAULT_REGION"),
     )
     return session

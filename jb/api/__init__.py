@@ -12,6 +12,7 @@ def permissions_required(permissions: Iterable):
     Use this as a decorator to functions that require user permissions control
     Pass permissions as a list of UserType enum values
     """
+
     def decorator(f):
         @wraps(f)
         @jwt_required
@@ -19,5 +20,7 @@ def permissions_required(permissions: Iterable):
             if current_user.user_type not in permissions:
                 abort(404)
             return f(*args, **kwargs)
+
         return decorated_function
+
     return decorator
