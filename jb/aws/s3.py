@@ -1,12 +1,18 @@
 """Interface to Amazon S3."""
+from typing import Optional
+
 import boto3
 from flask import current_app
 from flask import _app_ctx_stack as stack
 
 
-def default_bucket():
+def default_bucket() -> Optional[str]:
     """S3 bucket our current_app is configured to use."""
     return current_app.config.get("AWS_S3_BUCKET_NAME")
+
+
+def get_default_region() -> Optional[str]:
+    return current_app.config.get("AWS_DEFAULT_REGION")
 
 
 def upload_file(file_path, content, content_type):

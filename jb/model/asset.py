@@ -47,6 +47,7 @@ class Asset(BaseModel):
     updated = Column(TSTZ, nullable=True, onupdate=func.now())
     s3bucket = Column(Text, nullable=False)
     s3key = Column(Text, nullable=True)
+    region = Column(Text, nullable=False)
 
     mime_type = Column(Text, nullable=False)
     size = Column(Integer, nullable=True)
@@ -138,6 +139,7 @@ class Asset(BaseModel):
         filename=None,
         status=None,
         bucket_name=None,
+        region=None
     ):
         """Create an asset record for an S3 file.
 
@@ -151,6 +153,8 @@ class Asset(BaseModel):
         """
         if not bucket_name:
             bucket_name = s3.default_bucket()
+        if not region:
+            region = s3.get_default_region()
 
         # check for existing asset with the same s3key
         asset: cls = cls.query.filter_by(
@@ -193,6 +197,7 @@ class Asset(BaseModel):
                 views=0,
                 filename=filename,
                 size=content_length,
+                region=region,
             )
             if status:
                 asset.status = status
