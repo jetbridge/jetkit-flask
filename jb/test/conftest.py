@@ -12,10 +12,7 @@ from jb.test.app import create_app
 from jb.test.model.asset import Asset
 from jb.test.model.user import User
 from pytest_factoryboy import register  # noqa: F401
-from pytest_postgresql.factories import (
-    drop_postgresql_database,
-    init_postgresql_database,
-)
+from pytest_postgresql.factories import DatabaseJanitor
 
 # for faker
 LOCALE = "en_US"
@@ -42,6 +39,7 @@ class AssetFactory(factory.Factory):
 
     s3bucket = factory.Sequence(lambda n: f"{db_faker.word()}{n}")
     s3key = factory.Sequence(lambda n: f"{db_faker.word()}{n}")
+    region = "ap-southeast-1"
     mime_type = factory.Sequence(lambda n: f"{db_faker.word()}{n}")
     owner = factory.SubFactory(UserFactory)
 
@@ -52,6 +50,7 @@ register(AssetFactory)
 
 # Retrieve a database connection string from the environment
 # should be a DB that doesn't exist
+DB_VERSION = "10.10"
 DB_CONN = os.getenv("TEST_DATABASE_URL", "postgresql:///jb_core_test")
 DB_OPTS = sa.engine.url.make_url(DB_CONN).translate_connect_args()
 
@@ -59,16 +58,13 @@ DB_OPTS = sa.engine.url.make_url(DB_CONN).translate_connect_args()
 @pytest.fixture(scope="session")
 def database(request):
     """Create a Postgres database for the tests, and drop it when the tests are done."""
-    pg_host = DB_OPTS.get("host")
-    pg_port = DB_OPTS.get("port")
-    pg_user = DB_OPTS.get("username")
-    pg_db = DB_OPTS["database"]
+    host = DB_OPTS.get("host")
+    port = DB_OPTS.get("port")
+    user = DB_OPTS.get("username")
+    db_name = DB_OPTS["database"]
 
-    init_postgresql_database(pg_user, pg_host, pg_port, pg_db)
-
-    @request.addfinalizer
-    def drop_database():
-        drop_postgresql_database(pg_user, pg_host, pg_port, pg_db, 9.6)
+    with DatabaseJanitor(user, host, port, db_name, DB_VERSION):
+        yield
 
 
 @pytest.fixture(scope="session")

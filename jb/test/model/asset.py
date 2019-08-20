@@ -5,14 +5,15 @@ from jb.db import Model
 
 
 class Asset(Model, CoreAsset):
-    owner_id = Column(
+    __tablename__ = "test_asset"
+    user_id = Column(
         Integer,
-        ForeignKey("user.id", name="owner_user_fk", use_alter=True),
+        ForeignKey("test_user.id", name="owner_user_fk", use_alter=True),
         nullable=True,
     )
-    owner = relationship(
+    user = relationship(
         "jb.test.model.user.User",
         back_populates="assets",
-        foreign_keys=[owner_id],
+        foreign_keys=[user_id],
         uselist=False,
     )

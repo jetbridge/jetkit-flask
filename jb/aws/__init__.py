@@ -19,18 +19,6 @@ def is_in_aws() -> bool:
 
 
 def get_session():
-    """Get boto session.
-
-    Don't need to load creds if we're in AWS.
-    """
-    if is_in_aws():
-        return boto3.session.Session()
-
-    from flask import current_app as app
-
-    session = boto3.session.Session(
-        aws_access_key_id=app.config.get("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=app.config.get("AWS_ACCESS_KEY_SECRET"),
-        region_name=app.config.get("AWS_DEFAULT_REGION"),
-    )
+    """Get boto3 session. """
+    session = boto3.session.Session()
     return session

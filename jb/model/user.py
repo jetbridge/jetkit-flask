@@ -41,7 +41,7 @@ class CoreUser(BaseModel, Upsertable):
     def password(self):
         return self._password
 
-    @password.setter  # noqa: T484
+    @password.setter  # type: ignore
     def password(self, plaintext):
         self._password = generate_password_hash(plaintext)
 
@@ -49,7 +49,7 @@ class CoreUser(BaseModel, Upsertable):
     def user_type(self) -> CoreUserType:
         return self._user_type
 
-    @user_type.setter  # noqa: T484
+    @user_type.setter  # type: ignore
     # TODO: Any checks before changing the user_type?
     def user_type(self, new_type: CoreUserType):
         self._user_type = new_type

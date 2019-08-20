@@ -69,7 +69,7 @@ class Asset(BaseModel):
         return relationship("User", foreign_keys=[self.user_id], uselist=False)
 
     @classmethod
-    def process_s3_create_object_event (cls, record: dict):
+    def process_s3_create_object_event(cls, record: dict):
         assert "s3" in record
 
         # look up asset by key/bucket
@@ -139,7 +139,7 @@ class Asset(BaseModel):
         filename=None,
         status=None,
         bucket_name=None,
-        region=None
+        region=None,
     ):
         """Create an asset record for an S3 file.
 

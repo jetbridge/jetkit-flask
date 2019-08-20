@@ -3,7 +3,7 @@ from typing import Optional
 
 import boto3
 from flask import current_app
-from flask import _app_ctx_stack as stack
+from flask import _app_ctx_stack as stack  # type: ignore
 
 
 def default_bucket() -> Optional[str]:
@@ -145,11 +145,7 @@ def _connect_to_s3():
     if stack and stack.top and hasattr(stack.top, "jetbridge_s3_client"):
         return getattr(stack.top, "jetbridge_s3_client")
     session = boto3.session.Session()
-    client = session.client(
-        "s3",
-        aws_access_key_id=current_app.config.get("AWS_ACCESS_KEY_ID"),
-        aws_secret_access_key=current_app.config.get("AWS_ACCESS_KEY_SECRET"),
-    )
+    client = session.client("s3")
     if stack and stack.top:
         setattr(stack.top, "jetbridge_s3_client", client)
     return client
