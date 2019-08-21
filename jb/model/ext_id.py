@@ -17,6 +17,11 @@ class ExtID:
     @classmethod
     def add_create_uuid_extension_trigger(cls, TableClass):
         """Call this for any tables that use ext_id to ensure they have the uuid-ossp extension already available."""
+
+        if not hasattr(TableClass, "__table__"):
+            raise Exception(
+                "add_create_uuid_extension_trigger not called on a SQLAlchemy model class"
+            )
         trigger = DDL('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
         event.listen(
             TableClass.__table__,

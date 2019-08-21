@@ -1,4 +1,4 @@
-"""Asset model - files stored on AWS S3."""
+"""Keep a record in the database of external files."""
 import logging
 import re
 from datetime import datetime
@@ -157,11 +157,11 @@ class S3Asset(Asset, Upsertable):
 
     @classmethod
     def get_default_bucket(cls) -> str:
-        return s3.default_bucket()
+        return s3.get_default_bucket()
 
     @classmethod
     def get_default_region(cls) -> str:
-        return s3.get_default_region()
+        return s3.get_region()
 
     @classmethod
     def sanitize_s3_key(cls, key: str) -> str:
@@ -199,6 +199,3 @@ class S3Asset(Asset, Upsertable):
         # TODO: save mime type here
         self.size = s3_obj_evt["size"]
         self.updated = func.now()
-
-
-ExtID.add_create_uuid_extension_trigger(Asset)
