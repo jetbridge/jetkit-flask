@@ -143,7 +143,7 @@ class S3Asset(Asset, Upsertable):
         acl: s3.ACL = s3.ACL.private,
     ):
         """Get a S3 presigned URL to upload a file via PUT."""
-        s3.generate_presigned_put(
+        return s3.generate_presigned_put(
             content_type=content_type,
             expire=expire,
             acl=acl,
