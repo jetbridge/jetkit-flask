@@ -119,7 +119,7 @@ class S3Asset(Asset, Upsertable):
 
     def presigned_view_url(self):
         """Generate presigned URL to view this asset."""
-        return s3.get_presigned_view_url(self.s3bucket, self.s3key)
+        return s3.generate_presigned_view_url(self.s3bucket, self.s3key)
 
     def _dt(self, dt: datetime) -> str:
         if not dt:
