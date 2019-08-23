@@ -99,23 +99,6 @@ def generate_presigned_put(
     return S3PresignedUpload(url=url, headers=headers)
 
 
-def upload_file(file_path, content, content_type):
-    """Upload file contents to AWS S3.
-
-    :param file_path: name of an uploaded file
-    :param content: file content to be uploaded
-    :param content_type: mime type of file that should be uploaded
-    :returns: S3 key
-    """
-    client().put_object(
-        Bucket=get_default_bucket(),
-        Key=file_path,
-        Body=content,
-        ContentType=content_type,
-    )
-    return file_path
-
-
 def put(key: str, content, content_type: str = None, bucket=None):
     """Upload file contents to S3.
 
