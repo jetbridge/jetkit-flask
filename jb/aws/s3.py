@@ -1,5 +1,7 @@
 """Interface to Amazon S3."""
 import enum
+from typing import Optional
+
 import boto3
 from flask import current_app
 from dataclasses_json import dataclass_json
@@ -73,19 +75,19 @@ def generate_presigned_put(
     key: str,
     content_type: str = None,
     expire: int = 86400,
-    acl: ACL = ACL.private,
+    acl: Optional[ACL] = ACL.private,
 ) -> S3PresignedUpload:
     """Generate a presigned URL that can be used to upload a file before the expiration time.
 
     :returns: An object to return to frontend with URL and headers that should be sent when doing a PUT to S3.
     """
-    headers = {"x-amz-acl": acl.value}
-
-    assert bucket
-    assert key
-
     # PutObject params
-    put_params = dict(Bucket=bucket, Key=key, ACL=acl.value)
+    put_params = dict(Bucket=bucket, Key=key)
+    headers = {}
+
+    if acl:
+        put_params["ACL"] = acl.value
+        headers["x-amz-acl"] = acl.value
     if content_type:
         put_params["ContentType"] = content_type
         headers["content-type"] = content_type
@@ -93,6 +95,7 @@ def generate_presigned_put(
     url = client().generate_presigned_url(
         ClientMethod="put_object", Params=put_params, ExpiresIn=expire
     )
+
     return S3PresignedUpload(url=url, headers=headers)
 
 

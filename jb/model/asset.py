@@ -106,6 +106,16 @@ class S3Asset(Asset, Upsertable):
         )
 
     @classmethod
+    def create(cls, filename: str = None, mime_type: str = None) -> "S3Asset":
+        return cls(
+            region=s3.get_region(),
+            s3bucket=s3.get_default_bucket(),
+            s3key=cls.generate_key(filename),
+            filename=filename,
+            mime_type=mime_type,
+        )
+
+    @classmethod
     def upsert(cls, s3key: str, **kwargs) -> "S3Asset":
         # add defaults for region, bucket if not present
         return super().upsert_row(
@@ -173,7 +183,7 @@ class S3Asset(Asset, Upsertable):
         self,
         content_type: str = None,
         expire: int = 86400,
-        acl: s3.ACL = s3.ACL.private,
+        acl: Optional[s3.ACL] = s3.ACL.private,
     ) -> s3.S3PresignedUpload:
         """Get a S3 presigned URL to upload a file via PUT."""
         return s3.generate_presigned_put(
