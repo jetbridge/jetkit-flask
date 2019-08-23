@@ -1,19 +1,24 @@
-from jb.model.asset import Asset as CoreAsset
+from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import relationship
-from sqlalchemy import Integer, ForeignKey, Column
+
 from jb.db import Model
+from jb.model.asset import S3Asset as CoreAsset
+from jb.model.ext_id import ExtID
 
 
 class Asset(Model, CoreAsset):
     __tablename__ = "test_asset"
-    user_id = Column(
+    owner_id = Column(
         Integer,
         ForeignKey("test_user.id", name="owner_user_fk", use_alter=True),
         nullable=True,
     )
-    user = relationship(
+    owner = relationship(
         "jb.test.model.user.User",
         back_populates="assets",
-        foreign_keys=[user_id],
+        foreign_keys=[owner_id],
         uselist=False,
     )
+
+
+ExtID.add_create_uuid_extension_trigger(Asset)

@@ -13,7 +13,7 @@ from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Text
 
 import jb.aws.s3 as s3
-from jb.db import BaseModel, Upsertable, db
+from jb.db import BaseModel, Upsertable
 from jb.model.ext_id import ExtID
 
 log = logging.getLogger(__name__)
@@ -25,15 +25,16 @@ class Asset(BaseModel, ExtID):
     """Keep a record of files that are stored somewhere.
 
     You should use S3Asset if you are using S3.
+    To ensure the Postgres UUID extension is present, be sure to add `ExtID.add_create_uuid_extension_trigger(Asset)`
     """
 
-    mime_type = Column(Text, nullable=False)
+    mime_type = Column(Text, nullable=True)
     size = Column(Integer, nullable=True)
 
     filename = Column(Text, nullable=True)
 
     @declared_attr
-    def user_id(self):
+    def owner_id(self):
         return Column(
             Integer,
             ForeignKey("user.id", name="owner_user_fk", use_alter=True),
@@ -42,12 +43,12 @@ class Asset(BaseModel, ExtID):
 
     @declared_attr
     def owner(self):
-        return relationship("User", foreign_keys=[self.user_id], uselist=False)
+        return relationship("User", foreign_keys=[self.owner_id], uselist=False)
 
     @classmethod
     def filter_query_for_user(cls, query, user):
         """List only assets created by user."""
-        return query.filter(cls.user_id == user.id)
+        return query.filter(cls.owner_id == user.id)
 
     def check_main_type(self, expected_type):
         """Check if main mime type is equal to expected type."""
@@ -72,11 +73,18 @@ class Asset(BaseModel, ExtID):
 
     def user_can_read(self, user):
         """Check if a user can view this asset."""
-        return user.id == self.user_id
+        return user.id == self.owner_id
 
     def user_can_write(self, user):
         """Asset creator can update asset."""
-        return user.id == self.user_id
+        return user.id == self.owner_id
+
+
+class UnknownS3Key(Exception):
+    def __init__(self, bucket: str, key: str):
+        super().__init__(
+            f"Got S3 PutObject event for key `{key}` in `{bucket}` but no matching asset row was found."
+        )
 
 
 class S3Asset(Asset, Upsertable):
@@ -84,20 +92,41 @@ class S3Asset(Asset, Upsertable):
     s3key = Column(Text, nullable=True)
     region = Column(Text, nullable=False)
 
-    # unique on bucket/key
-    s3key_uniq_idx = Index("asset_s3key_uniq_idx", s3bucket, s3key, unique=True)
-
-    @classmethod
-    def upsert(cls, **kwargs) -> "Asset":
-        # add defaults for region, bucket if not present
-        return super().upsert_row(
-            row_class=cls,
-            values=dict(
-                region=s3.get_region, s3bucket=s3.get_default_bucket(), **kwargs
+    # unique index on bucket/key
+    # c.f. https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/mixins.html
+    @declared_attr
+    def __table_args__(cls):
+        return (
+            Index(
+                f"{cls.__tablename__}_asset_s3key_uniq_idx",
+                "s3bucket",
+                "s3key",
+                unique=True,
             ),
         )
 
-    @staticmethod
+    @classmethod
+    def upsert(cls, s3key: str, **kwargs) -> "S3Asset":
+        # add defaults for region, bucket if not present
+        return super().upsert_row(
+            row_class=cls,
+            index_elements=["s3bucket", "s3key"],
+            values=dict(
+                s3key=s3key,
+                region=s3.get_region(),
+                s3bucket=s3.get_default_bucket(),
+                **kwargs,
+            ),
+        )
+
+    @classmethod
+    def upsert_for_filename(
+        cls, filename: str = None, prefix: str = None, **kwargs
+    ) -> "S3Asset":
+        s3key = cls.generate_key(filename=filename, prefix=prefix)
+        return cls.upsert(s3key=s3key, **kwargs)
+
+    @classmethod
     def generate_key(cls, filename: str = None, prefix: str = None) -> str:
         """
         Generate unique (hopefully) s3 key for a given filename.
@@ -117,33 +146,37 @@ class S3Asset(Asset, Upsertable):
             parts.append(cls.sanitize_s3_key(filename))
         return "/".join(parts)
 
-    def presigned_view_url(self):
+    def presigned_view_url(self, **kwargs) -> str:
         """Generate presigned URL to view this asset."""
-        return s3.get_presigned_view_url(self.s3bucket, self.s3key)
+        return s3.generate_presigned_view_url(
+            bucket=self.s3bucket, key=self.s3key, **kwargs
+        )
 
     def _dt(self, dt: datetime) -> str:
         if not dt:
             return "n"
         return str(dt.timestamp())
 
-    def s3_direct_url(self):
+    def s3_direct_url(self) -> str:
         """Generate S3 URL, assumes this is viewable by the world."""
         lastmod = self.updated if self.updated else self.created
-        return furl(
-            scheme="https",
-            host=f"{self.s3bucket}.s3.{self.region}.amazonaws.com",
-            path=f"/{self.s3key}",
-            args={"t": self._dt(lastmod)},
+        return str(
+            furl(
+                scheme="https",
+                host=f"{self.s3bucket}.s3.{self.region}.amazonaws.com",
+                path=f"/{self.s3key}",
+                args={"t": self._dt(lastmod)},
+            )
         )
 
-    def presigned_upload_url(
+    def presigned_put(
         self,
         content_type: str = None,
         expire: int = 86400,
         acl: s3.ACL = s3.ACL.private,
-    ):
+    ) -> s3.S3PresignedUpload:
         """Get a S3 presigned URL to upload a file via PUT."""
-        s3.generate_presigned_put(
+        return s3.generate_presigned_put(
             content_type=content_type,
             expire=expire,
             acl=acl,
@@ -152,7 +185,7 @@ class S3Asset(Asset, Upsertable):
         )
 
     @classmethod
-    def find_by_s3key(cls, s3bucket: str, s3key: str) -> Optional["Asset"]:
+    def find_by_s3key(cls, s3bucket: str, s3key: str) -> Optional["S3Asset"]:
         return cls.query.filter_by(s3key=s3key, s3bucket=s3bucket).one_or_none()
 
     @classmethod
@@ -170,7 +203,7 @@ class S3Asset(Asset, Upsertable):
         return SLUGIFY_S3_KEY.sub("_", key)
 
     @classmethod
-    def process_s3_create_object_event(cls, record: dict):
+    def process_s3_create_object_event(cls, record: dict) -> "S3Asset":
         assert "s3" in record
 
         # look up asset by key/bucket
@@ -178,24 +211,15 @@ class S3Asset(Asset, Upsertable):
         s3key = s3["object"]["key"]
         s3bucket = s3["bucket"]["name"]
 
-        asset = (
-            db.session.query(Asset)
-            .filter_by(s3key=s3key, s3bucket=s3bucket)
-            .one_or_none()
-        )
+        # query asset
+        asset = cls.query.filter_by(s3key=s3key, s3bucket=s3bucket).one_or_none()
         if not asset:
-            log.error(
-                f"Got S3 event for object {s3key} in {s3bucket} but no asset row was found."
-            )
-            # do nothing
-            return None
+            raise UnknownS3Key(key=s3key, bucket=s3bucket)
 
         asset.update_from_upload(s3["object"])
-        db.session.commit()
-
         return asset
 
     def update_from_upload(self, s3_obj_evt: dict):
         # TODO: save mime type here
         self.size = s3_obj_evt["size"]
-        self.updated = func.now()
+        self.updated = func.clock_timestamp()

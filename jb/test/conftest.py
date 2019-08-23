@@ -1,14 +1,14 @@
 import os
-
 import factory
 import pytest
 import sqlalchemy as sa
-from faker import Factory as FakerFactory
-from faker import Faker
+import boto3
+from unittest.mock import patch
+from moto import mock_s3
+from faker import Factory as FakerFactory, Faker
 from flask_jwt_extended import create_access_token, create_refresh_token
 from jb.model.user import CoreUserType
-from jb.test.app import api_auth, api_user  # noqa: F401
-from jb.test.app import create_app
+from jb.test.app import api_auth, api_user, create_app  # noqa: F401
 from jb.test.model.asset import Asset
 from jb.test.model.user import User
 from pytest_factoryboy import register  # noqa: F401
@@ -54,6 +54,13 @@ DB_VERSION = "10.10"
 DB_CONN = os.getenv("TEST_DATABASE_URL", "postgresql:///jb_core_test")
 DB_OPTS = sa.engine.url.make_url(DB_CONN).translate_connect_args()
 
+# flask app config overrides for testing
+TEST_APP_CONFIG = dict(
+    SQLALCHEMY_DATABASE_URI=DB_CONN,
+    AWS_S3_BUCKET_NAME="test-bucket",
+    SQLALCHEMY_ECHO=bool(os.getenv("SQL_ECHO")),
+)
+
 
 @pytest.fixture(scope="session")
 def database(request):
@@ -71,7 +78,7 @@ def database(request):
 def app(database):
     """Create a Flask app context for tests."""
     # override config for test app here
-    app = create_app(dict(SQLALCHEMY_DATABASE_URI=DB_CONN))
+    app = create_app(config=TEST_APP_CONFIG)
 
     with app.app_context():
         yield app
@@ -125,3 +132,20 @@ def faker():
 def session(db_session):
     """Ensure every test is inside a subtransaction giving us a clean slate each test."""
     yield db_session
+
+
+@pytest.fixture
+def s3_client():
+    import jb.aws.s3
+
+    with mock_s3():
+        with patch.object(jb.aws.s3, "get_region") as get_region_patch:
+            get_region_patch.return_value = "us-east-1"
+            s3 = boto3.client("s3")
+            yield s3
+
+
+@pytest.fixture
+def s3_bucket(app, s3_client):
+    bucket_name = app.config["AWS_S3_BUCKET_NAME"]
+    s3_client.create_bucket(Bucket=bucket_name)

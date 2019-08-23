@@ -58,7 +58,7 @@ jobs:
       - run:
           command: |
             sudo pip install pipenv
-            pipenv install --deploy --dev
+            pipenv sync --bare --dev
       - save_cache: # cache Python dependencies using checksum of Pipfile as the cache-key
           key: v2-dep-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
