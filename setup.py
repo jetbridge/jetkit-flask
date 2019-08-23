@@ -29,6 +29,7 @@ setup(
     install_requires=[
         "Flask",
         "boto3",
+        "dataclasses_json",
         "sqlalchemy",
         "requests",
         "furl",
