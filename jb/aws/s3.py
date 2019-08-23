@@ -47,28 +47,6 @@ def get_region() -> str:
 def client(region: str = None):
     session = boto3.session.Session()
 
-
-class S3MisconfigurationException(Exception):
-    pass
-
-
-def get_default_bucket() -> str:
-    if "AWS_S3_BUCKET_NAME" not in current_app.config:
-        raise S3MisconfigurationException("AWS_S3_BUCKET_NAME is not defined")
-    return current_app.config["AWS_S3_BUCKET_NAME"]
-
-
-def get_region() -> str:
-    session = boto3.session.Session()
-    region = session.region_name
-    if not region:
-        raise S3MisconfigurationException("AWS region not configured")
-    return region
-
-
-def client(region: str = None):
-    session = boto3.session.Session()
-
     # try to determine current region
     region = region or get_region()
 
@@ -159,6 +137,7 @@ def delete(key: str):
     """Delete file from S3."""
     s3 = client()
     return s3.delete_object(Bucket=get_default_bucket(), Key=key)
+
 
 def get(key: str, bucket: str = None):
     """Get file contents from AWS S3 by its key.
