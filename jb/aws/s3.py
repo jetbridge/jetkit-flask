@@ -4,6 +4,16 @@ from typing import Optional
 
 import boto3
 from flask import current_app
+from dataclasses_json import dataclass_json
+from dataclasses import dataclass
+from typing import Dict
+
+
+@dataclass_json
+@dataclass
+class S3PresignedUpload:
+    url: str
+    headers: Dict[str, str]
 
 
 @enum.unique
@@ -37,13 +47,35 @@ def get_region() -> str:
 def client(region: str = None):
     session = boto3.session.Session()
 
+
+class S3MisconfigurationException(Exception):
+    pass
+
+
+def get_default_bucket() -> str:
+    if "AWS_S3_BUCKET_NAME" not in current_app.config:
+        raise S3MisconfigurationException("AWS_S3_BUCKET_NAME is not defined")
+    return current_app.config["AWS_S3_BUCKET_NAME"]
+
+
+def get_region() -> str:
+    session = boto3.session.Session()
+    region = session.region_name
+    if not region:
+        raise S3MisconfigurationException("AWS region not configured")
+    return region
+
+
+def client(region: str = None):
+    session = boto3.session.Session()
+
     # try to determine current region
     region = region or get_region()
 
     return session.client("s3", endpoint_url=f"https://s3.{region}.amazonaws.com")
 
 
-def generate_presigned_view_url(bucket, key, expires_in=86400):
+def generate_presigned_view_url(bucket: str, key: str, expires_in=86400):
     """Get pre-signed URL for viewing an S3 object.
 
     :param bucket: name of an S3 bucket
@@ -66,18 +98,11 @@ def generate_presigned_put(
     content_type: str = None,
     expire: int = 86400,
     acl: Optional[ACL] = ACL.private,
-):
-    """Generate a presigned URL that is good to upload the file key for a short time.
+) -> S3PresignedUpload:
+    """Generate a presigned URL that can be used to upload a file before the expiration time.
 
-    This returns a full URL with all parameters encoded, unlike get_presigned_upload.
-    This is simpler and better, use this instead of get_presigned_upload.
-
-    :returns: url to upload to.
+    :returns: An object to return to frontend with URL and headers that should be sent when doing a PUT to S3.
     """
-
-    assert bucket
-    assert key
-
     # PutObject params
     put_params = dict(Bucket=bucket, Key=key)
     headers = {}
@@ -92,7 +117,8 @@ def generate_presigned_put(
     url = client().generate_presigned_url(
         ClientMethod="put_object", Params=put_params, ExpiresIn=expire
     )
-    return {"url": url, "headers": headers}
+
+    return S3PresignedUpload(url=url, headers=headers)
 
 
 def upload_file(file_path, content, content_type):
@@ -112,19 +138,35 @@ def upload_file(file_path, content, content_type):
     return file_path
 
 
-def delete_file(key):
-    """Delete file from AWS S3."""
+def put(key: str, content, content_type: str = None, bucket=None):
+    """Upload file contents to S3.
+
+    :param content: file content to be uploaded
+    :param content_type: mime type of file that should be uploaded
+    """
+    if not bucket:
+        bucket = get_default_bucket()
+
+    req = dict(Bucket=bucket, Key=key, Body=content)
+
+    if content_type:
+        req["ContentType"] = content_type
+
+    client().put_object(**req)
+
+
+def delete(key: str):
+    """Delete file from S3."""
     s3 = client()
     return s3.delete_object(Bucket=get_default_bucket(), Key=key)
 
-
-def get_file(file_key, bucket_name=None):
+def get(key: str, bucket: str = None):
     """Get file contents from AWS S3 by its key.
 
     :param file_key: key by which a file is stored
     :return A wrapper object over file stored in S3 under specified key
     """
-    if not bucket_name:
-        bucket_name = get_default_bucket()
+    if not bucket:
+        bucket = get_default_bucket()
 
-    return client().get_object(Bucket=bucket_name, Key=file_key)
+    return client().get_object(Bucket=bucket, Key=key)
