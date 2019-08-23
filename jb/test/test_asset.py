@@ -66,6 +66,10 @@ def test_s3_file_ops(asset: Asset, s3_bucket):
     jbs3.delete(key)
 
 
+def test_presigned_put_url_without_acl_requires_no_headers(asset: Asset):
+    assert len(asset.presigned_put(acl=None).headers) == 0
+
+
 # sample s3 ObjectCreated:Put event
 sample_put_event = {
     "Records": [
