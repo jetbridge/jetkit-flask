@@ -140,9 +140,12 @@ class S3Asset(Asset, Upsertable):
 
     @classmethod
     def upsert_for_filename(
-        cls, filename: str = None, prefix: str = None, **kwargs
+        cls, filename: str = None, prefix: str = None, owner=None, **kwargs
     ) -> "S3Asset":
         s3key = cls.generate_key(filename=filename, prefix=prefix)
+        if owner:
+            assert owner.id
+            kwargs["owner_id"] = owner.id
         return cls.upsert(s3key=s3key, **kwargs)
 
     @classmethod
