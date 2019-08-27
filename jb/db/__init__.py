@@ -40,9 +40,7 @@ class Upsertable:
         should_return_result=True,
         values: Dict[str, Any],
     ):
-        """Insert or update if index_elements match.
-
-        N.B. does not commit.
+        """Insert, or update if index_elements match.
 
         :set_: sets values if exists
         :values: are inserted if not exists
