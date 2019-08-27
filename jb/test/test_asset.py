@@ -7,13 +7,18 @@ def test_asset_upsert():
     Asset.upsert(s3key="foo/bar")
 
 
-def test_generate_key():
+def test_generate_key(user, session):
+    session.add(user)
+    session.commit()
+
     key = Asset.generate_key(filename="foo.jpg", prefix="dir")
     assert key.endswith("/foo.jpg")
     assert key.startswith("dir/")
 
     # same as above
-    Asset.upsert_for_filename(filename="foo.jpg", prefix="dir")
+    asset = Asset.upsert_for_filename(filename="foo.jpg", prefix="dir", owner=user)
+
+    asset.object()
 
 
 def test_asset_generate_presigned_urls(s3_bucket, asset: Asset):

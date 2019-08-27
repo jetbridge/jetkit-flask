@@ -111,7 +111,7 @@ class S3Asset(Asset, Upsertable):
 
         https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#object
         """
-        client = s3.client()
+        client = boto3.resource("s3")
         return client.Object(self.s3bucket, self.s3key)
 
     @classmethod
