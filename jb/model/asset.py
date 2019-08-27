@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from typing import Optional
 from uuid import uuid4
+import boto3
 
 from furl import furl
 from sqlalchemy import Index, func
@@ -104,6 +105,14 @@ class S3Asset(Asset, Upsertable):
                 unique=True,
             ),
         )
+
+    def object(self):
+        """Get boto3 S3.Object.
+
+        https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#object
+        """
+        client = s3.client()
+        return client.Object(self.s3bucket, self.s3key)
 
     @classmethod
     def create(cls, filename: str = None, mime_type: str = None) -> "S3Asset":

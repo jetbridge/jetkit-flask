@@ -31,7 +31,7 @@ class S3MisconfigurationException(Exception):
 
 
 def get_default_bucket() -> str:
-    if "AWS_S3_BUCKET_NAME" not in current_app.config or current_app.config.get(
+    if "AWS_S3_BUCKET_NAME" not in current_app.config or not current_app.config.get(
         "AWS_S3_BUCKET_NAME"
     ):
         raise S3MisconfigurationException("AWS_S3_BUCKET_NAME is not defined")
