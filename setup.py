@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 NAME = "jb"
 DESCRIPTION = "Common reusable code for python projects."
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 REQUIRES_PYTHON = ">=3.6.0"
 
 setup(
@@ -29,7 +29,7 @@ setup(
     install_requires=[
         "Flask",
         "boto3",
-        "dataclasses_json",
+        "dataclasses-json",
         "sqlalchemy",
         "requests",
         "furl",
