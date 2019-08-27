@@ -107,7 +107,7 @@ class S3Asset(Asset, Upsertable):
 
     @classmethod
     def create(cls, filename: str = None, mime_type: str = None) -> "S3Asset":
-        return cls(
+        return cls(  # type: ignore
             region=s3.get_region(),
             s3bucket=s3.get_default_bucket(),
             s3key=cls.generate_key(filename),
