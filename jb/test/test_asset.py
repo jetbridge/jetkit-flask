@@ -3,11 +3,11 @@ from time import sleep
 import jb.aws.s3 as jbs3
 
 
-def test_asset_upsert():
+def test_asset_upsert(s3_client):
     Asset.upsert(s3key="foo/bar")
 
 
-def test_generate_key(user, session):
+def test_generate_key(user, session, s3_client):
     session.add(user)
     session.commit()
 

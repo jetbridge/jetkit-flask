@@ -7,15 +7,20 @@ from flask import current_app
 MAILGUN_BASE_URL = "https://api.mailgun.net/v3"
 
 
-class Client:
-    def __init__(self):
-        self.base_url = current_app.config.get("MAILGUN_BASE_URL", MAILGUN_BASE_URL)
-        self.enabled = current_app.config["EMAIL_SENDING_ENABLED"]
-        self.support_email = current_app.config["SUPPORT_EMAIL"]
-        self.api_key = current_app.config["MAILGUN_API_KEY"]
-        self.default_sender = current_app.config.get(
-            "MAILGUN_DEFAULT_SENDER", self.support_email
-        )
+class BaseClient:
+    def __init__(
+        self,
+        enabled: bool,
+        support_email: str,
+        api_key: str,
+        base_url: str = MAILGUN_BASE_URL,
+        default_sender: str = None
+    ):
+        self.enabled = enabled
+        self.support_email = support_email
+        self.api_key = api_key
+        self.base_url = base_url
+        self.default_sender = default_sender or support_email
 
     def _auth(self) -> Tuple[str, str]:
         return "api", self.api_key
@@ -59,3 +64,15 @@ class Client:
         res = requests.post(self._send_message_url(), auth=self._auth(), data=params)
         res.raise_for_status()
         return res.json()
+
+
+class Client(BaseClient):
+    """Mailgun client that looks up configuration in current Flask app."""
+    def __init__(self):
+        super().__init__(
+            enabled=current_app.config["EMAIL_SENDING_ENABLED"],
+            support_email=current_app.config["SUPPORT_EMAIL"],
+            api_key=current_app.config["MAILGUN_API_KEY"],
+            base_url=current_app.config.get("MAILGUN_BASE_URL"),
+            default_sender=current_app.config.get("MAILGUN_DEFAULT_SENDER"),
+        )
