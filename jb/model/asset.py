@@ -115,13 +115,16 @@ class S3Asset(Asset, Upsertable):
         return client.Object(self.s3bucket, self.s3key)
 
     @classmethod
-    def create(cls, filename: str = None, mime_type: str = None) -> "S3Asset":
+    def create(
+        cls, owner=None, filename: str = None, mime_type: str = None
+    ) -> "S3Asset":
         return cls(  # type: ignore
             region=s3.get_region(),
             s3bucket=s3.get_default_bucket(),
             s3key=cls.generate_key(filename),
             filename=filename,
             mime_type=mime_type,
+            owner=owner,
         )
 
     @classmethod
