@@ -184,7 +184,7 @@ class S3Asset(Asset, Upsertable):
 
     def s3_direct_url(self) -> str:
         """Generate S3 URL, assumes this is viewable by the world."""
-        lastmod = self.updated if self.updated else self.created
+        lastmod = self.updated_at if self.updated_at else self.created_at
         return str(
             furl(
                 scheme="https",
@@ -247,4 +247,4 @@ class S3Asset(Asset, Upsertable):
     def update_from_upload(self, s3_obj_evt: dict):
         # TODO: save mime type here
         self.size = s3_obj_evt["size"]
-        self.updated = func.clock_timestamp()
+        self.updated_at = func.clock_timestamp()
