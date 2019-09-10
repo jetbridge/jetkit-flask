@@ -118,6 +118,8 @@ class S3Asset(Asset, Upsertable):
     def create(
         cls, owner=None, filename: str = None, mime_type: str = None
     ) -> "S3Asset":
+        if owner:
+            assert owner.id
         return cls(  # type: ignore
             region=s3.get_region(),
             s3bucket=s3.get_default_bucket(),
