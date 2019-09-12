@@ -71,7 +71,7 @@ def test_s3_file_ops(asset: Asset, s3_bucket):
     jbs3.delete(key)
 
 
-def test_presigned_put_url_without_acl_requires_no_headers(asset: Asset):
+def test_presigned_put_url_without_acl_requires_no_headers(asset: Asset, s3_bucket):
     assert len(asset.presigned_put(acl=None).headers) == 0
 
 
