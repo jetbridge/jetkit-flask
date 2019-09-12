@@ -60,7 +60,7 @@ def sortable_by(*permitted_columns: Column,):
             if column_to_sort_by is None:
                 abort(400, message=f"'{sort_field_name}' is not a valid sorting key")
 
-            if reverse_parameter == "1":
+            if reverse_parameter == Order.desc:
                 column_to_sort_by = desc(column_to_sort_by)
 
             return query.order_by(column_to_sort_by)
