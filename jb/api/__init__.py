@@ -31,12 +31,15 @@ def permissions_required(permissions: Iterable):
 
 
 @unique
-class Order(Enum):
+class SortOrder(Enum):
     desc = "desc"
     asc = "asc"
 
 
-def sortable_by(*permitted_columns: Column,):
+def sortable_by(*permitted_columns: Column):
+    """Allows to sort result of api call.
+    Wrapped function needs to return sql query.
+    """
     permitted_columns_by_name = {column.name: column for column in permitted_columns}
 
     def decorator(request_handler):
@@ -46,7 +49,7 @@ def sortable_by(*permitted_columns: Column,):
 
             sort_field_name = request.args.get("sort_by")
             try:
-                reverse_parameter = Order(request.args.get("order", "asc"))
+                reverse_parameter = SortOrder(request.args.get("order", "asc"))
             except ValueError:
                 abort(
                     400,
@@ -77,6 +80,9 @@ def sortable_by(*permitted_columns: Column,):
 
 
 def combined_search_by(*columns: Column, search_parameter_name: str = "search"):
+    """Filters query by filtering on provided columns looking for requested search.
+        Wrapped function needs to return sql query.
+    """
     def decorator(request_handler):
         @wraps(request_handler)
         def wrapper(*args, **kwargs):
@@ -102,6 +108,9 @@ def searchable_by(
     autoname=True,
     autoname_prefix="search_",
 ):
+    """Filters query by filtering on provided columns looking for requested search.
+       Wrapped function needs to return sql query.
+    """
     fallback_parameter_name = autoname_prefix + column.key if autoname else "search"
     search_parameter_name = search_parameter_name or fallback_parameter_name
 
