@@ -11,7 +11,7 @@ from flask import abort, request
 api = Api()
 
 
-def permissions_required(permissions: Iterable):
+def permissions_required(permissions: Iterable) -> Callable:
     """
     Use this as a decorator to functions that require user permissions control
     Pass permissions as a list of UserType enum values
@@ -36,7 +36,7 @@ class SortOrder(Enum):
     asc = "asc"
 
 
-def sortable_by(*permitted_columns: Column):
+def sortable_by(*permitted_columns: Column) -> Callable:
     """Allows to sort result of api call.
     Wrapped function needs to return sql query.
     """
@@ -79,7 +79,7 @@ def sortable_by(*permitted_columns: Column):
     return decorator
 
 
-def combined_search_by(*columns: Column, search_parameter_name: str = "search"):
+def combined_search_by(*columns: Column, search_parameter_name: str = "search") -> Callable:
     """Filters query by filtering on provided columns looking for requested search.
         Wrapped function needs to return sql query.
     """
@@ -107,7 +107,7 @@ def searchable_by(
     exact_match=False,
     autoname=True,
     autoname_prefix="search_",
-):
+) -> Callable:
     """Filters query by filtering on provided columns looking for requested search.
        Wrapped function needs to return sql query.
     """
