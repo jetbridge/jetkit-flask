@@ -186,7 +186,7 @@ class S3Asset(Asset, Upsertable):
 
     def s3_direct_url(self) -> str:
         """Generate S3 URL, assumes this is viewable by the world."""
-        lastmod = self.updated_at if self.updated_at else self.created_at
+        lastmod = self.updated_at or self.created_at
         return str(
             furl(
                 scheme="https",

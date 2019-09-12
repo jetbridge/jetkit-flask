@@ -14,7 +14,7 @@ class BaseClient:
         support_email: str,
         api_key: str,
         base_url: str = MAILGUN_BASE_URL,
-        default_sender: str = None
+        default_sender: str = None,
     ):
         self.enabled = enabled
         self.support_email = support_email
@@ -68,6 +68,7 @@ class BaseClient:
 
 class Client(BaseClient):
     """Mailgun client that looks up configuration in current Flask app."""
+
     def __init__(self):
         super().__init__(
             enabled=current_app.config["EMAIL_SENDING_ENABLED"],
