@@ -11,6 +11,20 @@ MailClient = TypeVar("MailClient", bound="MailClientBase")
 
 
 class MailClientBase(ABC):
+    """Base mail client, allowing sending of emails via a standard interface.
+
+
+    Can be used like this
+
+    ::
+
+        from jb.mail import MailerImplementation, mail_client
+        mail = mail_client(impl=MailerImplementation.mailgun, from_flask=True)
+        mail.send(subject="Mailgun test!", to="mischa@jetbridge.com", body="yo yo")
+
+    If using flask, configuration is pulled from the `EMAIL` config object.
+    """
+
     enabled: bool
     support_email: str
     default_sender: Optional[str]
