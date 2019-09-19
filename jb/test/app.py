@@ -6,13 +6,11 @@ from jb.db import db
 TEST_CONFIG = dict(
     TESTING=True,
     SECRET_KEY="testing",
-    EMAIL=dict(
-        enabled=True,
-        support_email="mischa@jetbridge.com",
-        api_key="fake-api-key",
-        base_url="https://api.mailgun.net/v3/sandboxd1c5a5b4f4a3492da59321a5fd2d17d6.mailgun.org",
-        default_sender="notifications@jetbridge.com",
-    ),
+    EMAIL_ENABLED=True,
+    EMAIL_SUPPORT="mischa@jetbridge.com",
+    EMAIL_API_KEY="fake-api-key",
+    EMAIL_DOMAIN="jetbridge.com",
+    EMAIL_DEFAULT_SENDER="notifications@jetbridge.com",
 )
 
 

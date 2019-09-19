@@ -8,30 +8,29 @@ MAILGUN_BASE_URL = "https://api.mailgun.net/v3"
 
 
 class MailgunClient(MailClientBase):
-    """Basic mailgun API client."""
+    """Mailgun API client.
+
+    Configuration required:
+
+    ::
+
+    EMAIL_DOMAIN = 'jetbridge.com'
+    EMAIL_API_KEY = '12341aef13ababc-bbbba34515-a3cca4'
+    """
 
     api_key: str
-    base_url: str
+    domain: str
 
-    def __init__(
-        self,
-        enabled: bool,
-        support_email: str,
-        api_key: str,
-        base_url: str = MAILGUN_BASE_URL,
-        default_sender: str = None,
-    ):
-        super().__init__(
-            enabled=enabled, support_email=support_email, default_sender=default_sender
-        )
-        self.api_key = api_key
-        self.base_url = base_url
+    def __init__(self, config):
+        super().__init__(config=config)
+        self.api_key = config["EMAIL_API_KEY"]
+        self.domain = config["EMAIL_DOMAIN"]
 
     def _auth(self) -> Tuple[str, str]:
         return "api", self.api_key
 
     def _send_message_url(self) -> str:
-        return f"{self.base_url}/messages"
+        return f"{MAILGUN_BASE_URL}/{self.domain}/messages"
 
     def send(
         self,

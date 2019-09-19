@@ -1,11 +1,7 @@
 """Mail sending common functionality."""
 from jb.mail.constant import MailerImplementation
 from abc import ABC, abstractmethod
-from typing import Mapping, List, TypeVar, Type, Optional
-
-# config data structure in flask
-# should correspond to implementation constructor args
-FLASK_CONFIG_KEY = "EMAIL"
+from typing import Mapping, List, TypeVar, Type, Optional, Union
 
 MailClient = TypeVar("MailClient", bound="MailClientBase")
 
@@ -29,32 +25,28 @@ class MailClientBase(ABC):
     support_email: str
     default_sender: Optional[str]
 
-    def __init__(
-        self, support_email: str, default_sender: str = None, enabled: bool = True
-    ):
-        self.enabled = enabled
-        self.support_email = support_email
-        self.default_sender = default_sender or support_email
+    def __init__(self, config: Mapping[str, Union[str, int, bool]]):
+        self.enabled = bool(config["EMAIL_ENABLED"])
+        self.support_email = str(config["EMAIL_SUPPORT"])
+        self.default_sender = str(
+            config.get("EMAIL_DEFAULT_SENDER", self.support_email)
+        )
 
     @classmethod
     def new_from_flask(cls: Type[MailClient], app=None, **kwargs) -> MailClient:
+        """Create new client using flask config."""
         if not app:
             from flask import current_app
 
             app = current_app
 
-        conf = app.config
-        if FLASK_CONFIG_KEY not in conf:
-            raise Exception(f"Flask config missing {FLASK_CONFIG_KEY}")
-
-        config_obj: Mapping[str, str] = conf.get(FLASK_CONFIG_KEY, {})
-        return cls(**config_obj)
+        return cls(config=app.config)
 
     @classmethod
     def new_for_impl(
         cls, impl: MailerImplementation, from_flask: bool = True, **kwargs
     ) -> "MailClientBase":
-        impl_cls = None  # FIXME: give this a type
+        impl_cls: Optional[Type[MailClientBase]] = None  # FIXME: give this a type
 
         if impl is MailerImplementation.dummy:
             from jb.mail.impl.dummy import DummyClient
@@ -64,7 +56,8 @@ class MailClientBase(ABC):
             from jb.mail.impl.mailgun import MailgunClient
 
             impl_cls = MailgunClient
-        else:
+
+        if not impl_cls:
             raise NotImplementedError(f"Unimplemented mailer {impl}")
 
         # construct client

@@ -10,8 +10,7 @@ def dummy_client():
     yield MailClientBase.new_for_impl(
         impl=MailerImplementation.dummy,
         from_flask=False,
-        enabled=True,
-        support_email="test@test.com",
+        config=dict(EMAIL_ENABLED=True, EMAIL_SUPPORT="test@test.com"),
     )
 
 
