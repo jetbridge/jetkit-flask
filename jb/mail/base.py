@@ -37,10 +37,13 @@ class MailClientBase(ABC):
         self.default_sender = default_sender or support_email
 
     @classmethod
-    def new_from_flask(cls: Type[MailClient], **kwargs) -> MailClient:
-        from flask import current_app
+    def new_from_flask(cls: Type[MailClient], app=None, **kwargs) -> MailClient:
+        if not app:
+            from flask import current_app
 
-        conf = current_app.config
+            app = current_app
+
+        conf = app.config
         if FLASK_CONFIG_KEY not in conf:
             raise Exception(f"Flask config missing {FLASK_CONFIG_KEY}")
 
