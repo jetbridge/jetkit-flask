@@ -3,7 +3,7 @@ from enum import Enum, unique
 from flask_rest_api import Api
 from functools import wraps
 
-from sqlalchemy import Column, desc
+from sqlalchemy import Column, desc, nullslast
 from typing import Iterable, Callable
 from flask_jwt_extended import jwt_required, current_user
 from flask import abort, request
@@ -66,7 +66,7 @@ def sortable_by(*permitted_columns: Column) -> Callable:
             if reverse_parameter == SortOrder.desc:
                 column_to_sort_by = desc(column_to_sort_by)
 
-            return query.order_by(column_to_sort_by)
+            return query.order_by(nullslast(column_to_sort_by))
 
         sorting_keys = ", ".join(f"`{key}`" for key in permitted_columns_by_name.keys())
         append_docs(
