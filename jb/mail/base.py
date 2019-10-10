@@ -18,7 +18,7 @@ class MailClientBase(ABC):
         mail = mail_client(impl=MailerImplementation.mailgun, from_flask=True)
         mail.send(subject="Mailgun test!", to="mischa@jetbridge.com", body="yo yo")
 
-    If using flask, configuration is pulled from the `EMAIL` config object.
+    If using flask, configuration is pulled from flask config object.
     """
 
     enabled: bool

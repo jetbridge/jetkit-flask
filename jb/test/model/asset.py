@@ -21,4 +21,4 @@ class Asset(Model, CoreAsset):
     )
 
 
-ExtID.add_create_uuid_extension_trigger(Asset)
+Asset.add_create_uuid_extension_trigger()

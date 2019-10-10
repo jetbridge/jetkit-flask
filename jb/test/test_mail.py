@@ -15,9 +15,16 @@ def dummy_client():
 
 
 @pytest.fixture
-def mailgun_client():
+def mailgun_client_flask():
     yield MailClientBase.new_for_impl(
         impl=MailerImplementation.mailgun, from_flask=True
+    )
+
+
+@pytest.fixture
+def mailgun_client_config():
+    yield MailClientBase.new_for_impl(
+        impl=MailerImplementation.mailgun, config={"EMAIL_ENABLED": False}
     )
 
 
@@ -26,9 +33,12 @@ def mocked_requests(mocker):
     mocker.patch.object(requests, "post", autospec=True)
 
 
-def test_login(app, mocked_requests, mailgun_client):
+def test_login(app, mocked_requests, mailgun_client_flask, mailgun_client_config):
     test_email = "test@test.com"
-    mailgun_client.send(
+    mailgun_client_flask.send(
+        to=[test_email], subject="mail test client", body="automated test"
+    )
+    mailgun_client_config.send(
         to=[test_email], subject="mail test client", body="automated test"
     )
 
