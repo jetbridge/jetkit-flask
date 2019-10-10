@@ -3,7 +3,6 @@ from sqlalchemy.orm import relationship
 
 from jb.db import Model
 from jb.model.asset import S3Asset as CoreAsset
-from jb.model.ext_id import ExtID
 
 
 class Asset(Model, CoreAsset):
