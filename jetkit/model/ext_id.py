@@ -1,7 +1,7 @@
 from sqlalchemy import Column, event, text
 from sqlalchemy.dialects.postgresql import UUID
 from typing import Optional, Generic, TypeVar
-from jb.db import db
+from jetkit.db import db
 from sqlalchemy.schema import DDL
 
 T = TypeVar("T", bound=db.Model)

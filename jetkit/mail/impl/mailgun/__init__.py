@@ -2,7 +2,7 @@ import json
 
 import requests
 from typing import List, Mapping, Tuple
-from jb.mail.base import MailClientBase
+from jetkit.mail.base import MailClientBase
 
 MAILGUN_BASE_URL = "https://api.mailgun.net/v3"
 

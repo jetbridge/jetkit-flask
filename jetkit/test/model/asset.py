@@ -1,8 +1,8 @@
 from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
-from jb.db import Model
-from jb.model.asset import S3Asset as CoreAsset
+from jetkit.db import Model
+from jetkit.model.asset import S3Asset as CoreAsset
 
 
 class Asset(Model, CoreAsset):
@@ -13,7 +13,7 @@ class Asset(Model, CoreAsset):
         nullable=True,
     )
     owner = relationship(
-        "jb.test.model.user.User",
+        "jetkit.test.model.user.User",
         back_populates="assets",
         foreign_keys=[owner_id],
         uselist=False,

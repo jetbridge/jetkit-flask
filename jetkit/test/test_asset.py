@@ -1,6 +1,6 @@
-from jb.test.model.asset import Asset
+from jetkit.test.model.asset import Asset
 from time import sleep
-import jb.aws.s3 as jbs3
+import jetkit.aws.s3 as jetkit_s3
 
 
 def test_asset_upsert(s3_client):
@@ -61,14 +61,14 @@ def test_s3_file_ops(asset: Asset, s3_bucket):
     key = "testkey.txt"
 
     # put
-    jbs3.put(key=key, content=content)
+    jetkit_s3.put(key=key, content=content)
 
     # get
-    obj = jbs3.get(key=key)
+    obj = jetkit_s3.get(key=key)
     assert obj["ContentLength"] == len(content)
 
     # delete
-    jbs3.delete(key)
+    jetkit_s3.delete(key)
 
 
 def test_presigned_put_url_without_acl_requires_no_headers(asset: Asset, s3_bucket):

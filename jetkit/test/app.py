@@ -1,7 +1,7 @@
 import pytest
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from jb.db import db
+from jetkit.db import db
 
 TEST_CONFIG = dict(
     TESTING=True,
@@ -15,7 +15,7 @@ TEST_CONFIG = dict(
 
 
 def create_app(config: dict = {}) -> Flask:
-    app = Flask("jb_test")
+    app = Flask("jetkit_test")
 
     # override config for test app
     app.config.update(dict(**TEST_CONFIG, **config))
@@ -25,7 +25,7 @@ def create_app(config: dict = {}) -> Flask:
 
     @jwt.user_loader_callback_loader
     def user_loader_callback(identity):
-        from jb.test.model.user import User
+        from jetkit.test.model.user import User
 
         if identity is None:
             return None
@@ -54,8 +54,8 @@ def create_app(config: dict = {}) -> Flask:
 
 @pytest.fixture()
 def api_auth(app):
-    from jb.api.auth import blp, CoreAuthAPI
-    from jb.test.model.user import User
+    from jetkit.api.auth import blp, CoreAuthAPI
+    from jetkit.test.model.user import User
 
     CoreAuthAPI(auth_model=User)
     app.register_blueprint(blp)
@@ -63,8 +63,8 @@ def api_auth(app):
 
 @pytest.fixture()
 def api_user(app):
-    from jb.api.user import blp, CoreUserAPI
-    from jb.test.model.user import User
+    from jetkit.api.user import blp, CoreUserAPI
+    from jetkit.test.model.user import User
 
     CoreUserAPI(user_model=User)
     app.register_blueprint(blp)

@@ -1,5 +1,5 @@
-from jb.mail.base import MailClientBase
-from jb.mail.constant import MailerImplementation
+from jetkit.mail.base import MailClientBase
+from jetkit.mail.constant import MailerImplementation
 import requests
 import pytest
 from unittest.mock import patch

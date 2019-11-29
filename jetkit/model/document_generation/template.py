@@ -2,7 +2,7 @@ import logging
 
 from themis_doc import Template as ThemisTemplate
 
-from jb.db import BaseModel
+from jetkit.db import BaseModel
 
 log = logging.getLogger(__name__)
 

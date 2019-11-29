@@ -1,6 +1,6 @@
 """Mail client that doesn't actually send mail."""
 
-from jb.mail.base import MailClientBase
+from jetkit.mail.base import MailClientBase
 from typing import List, Mapping
 import pprint
 import logging

@@ -1,5 +1,5 @@
 """Mail sending common functionality."""
-from jb.mail.constant import MailerImplementation
+from jetkit.mail.constant import MailerImplementation
 from abc import ABC, abstractmethod
 from typing import Mapping, List, TypeVar, Type, Optional, Union
 
@@ -14,7 +14,7 @@ class MailClientBase(ABC):
 
     ::
 
-        from jb.mail import MailerImplementation, mail_client
+        from jetkit.mail import MailerImplementation, mail_client
         mail = mail_client(impl=MailerImplementation.mailgun, from_flask=True)
         mail.send(subject="Mailgun test!", to="mischa@jetbridge.com", body="yo yo")
 
@@ -49,11 +49,11 @@ class MailClientBase(ABC):
         impl_cls: Optional[Type[MailClientBase]] = None  # FIXME: give this a type
 
         if impl is MailerImplementation.dummy:
-            from jb.mail.impl.dummy import DummyClient
+            from jetkit.mail.impl.dummy import DummyClient
 
             impl_cls = DummyClient
         elif impl is MailerImplementation.mailgun:
-            from jb.mail.impl.mailgun import MailgunClient
+            from jetkit.mail.impl.mailgun import MailgunClient
 
             impl_cls = MailgunClient
 

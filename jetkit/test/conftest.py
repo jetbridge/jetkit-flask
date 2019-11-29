@@ -7,10 +7,10 @@ from unittest.mock import patch
 from moto import mock_s3
 from faker import Factory as FakerFactory, Faker
 from flask_jwt_extended import create_access_token, create_refresh_token
-from jb.model.user import CoreUserType
-from jb.test.app import api_auth, api_user, create_app  # noqa: F401
-from jb.test.model.asset import Asset
-from jb.test.model.user import User
+from jetkit.model.user import CoreUserType
+from jetkit.test.app import api_auth, api_user, create_app  # noqa: F401
+from jetkit.test.model.asset import Asset
+from jetkit.test.model.user import User
 from pytest_factoryboy import register  # noqa: F401
 from pytest_postgresql.factories import DatabaseJanitor
 
@@ -51,7 +51,7 @@ register(AssetFactory)
 # Retrieve a database connection string from the environment
 # should be a DB that doesn't exist
 DB_VERSION = "10.10"
-DB_CONN = os.getenv("TEST_DATABASE_URL", "postgresql:///jb_core_test")
+DB_CONN = os.getenv("TEST_DATABASE_URL", "postgresql:///jetkit_test")
 DB_OPTS = sa.engine.url.make_url(DB_CONN).translate_connect_args()
 
 # flask app config overrides for testing
@@ -87,7 +87,7 @@ def app(database):
 @pytest.fixture(scope="session")
 def _db(app):
     """Provide the transactional fixtures with access to the database via a Flask-SQLAlchemy database connection."""
-    from jb.db import db
+    from jetkit.db import db
 
     # create all tables for test DB
     db.create_all()
@@ -136,10 +136,10 @@ def session(db_session):
 
 @pytest.fixture
 def s3_client():
-    import jb.aws.s3
+    import jetkit.aws.s3
 
     with mock_s3():
-        with patch.object(jb.aws.s3, "get_region") as get_region_patch:
+        with patch.object(jetkit.aws.s3, "get_region") as get_region_patch:
             get_region_patch.return_value = "us-east-1"
             s3 = boto3.client("s3")
             yield s3

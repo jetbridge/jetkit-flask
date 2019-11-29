@@ -1,5 +1,5 @@
 from enum import Enum, unique
-from jb.db import Upsertable, BaseModel
+from jetkit.db import Upsertable, BaseModel
 from sqlalchemy import Date, Text, Column, Enum as SQLAEnum
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash

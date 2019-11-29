@@ -13,9 +13,9 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Text
 
-import jb.aws.s3 as s3
-from jb.db import BaseModel, Upsertable
-from jb.model.ext_id import ExtID
+import jetkit.aws.s3 as s3
+from jetkit.db import BaseModel, Upsertable
+from jetkit.model.ext_id import ExtID
 
 log = logging.getLogger(__name__)
 

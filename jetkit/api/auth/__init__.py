@@ -9,7 +9,7 @@ from flask_jwt_extended import (
 )
 from abc import abstractmethod
 from sqlalchemy.orm import Query
-from jb.api.user.schema import UserSchema
+from jetkit.api.user.schema import UserSchema
 
 blp = Blueprint("Authentication", __name__, url_prefix="/api/auth")
 
