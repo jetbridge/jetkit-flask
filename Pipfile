@@ -32,7 +32,7 @@ importmagic = "*"
 epc = "*"
 pytest-xdist = "*"
 watchdog = "*"
-pytest-postgresql = {git = "https://github.com/ClearcodeHQ/pytest-postgresql.git"}
+pytest-postgresql = "*"
 pudb = "*"
 ipdb = "*"
 mypy_extensions = ">=0.4.1"
