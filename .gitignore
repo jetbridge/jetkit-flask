@@ -31,3 +31,6 @@ script/initialize_project.sh
 
 # Pycharm
 .idea
+
+# Ignore bento tool run paths (this line added by `bento init`)
+.bento/
