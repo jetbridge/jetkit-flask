@@ -33,7 +33,7 @@ def CoreUserAPI(user_model: UserModel, user_schema: Schema = UserSchema):
 
     @blp.route("<int:user_id>", methods=["DELETE"])
     @jwt_required
-    def delete_user(user_id: int) -> str
+    def delete_user(user_id: int) -> str:
         """Soft delete user"""
         user = user_model.query.get_or_404(user_id)
         user.mark_deleted()
