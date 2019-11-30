@@ -14,7 +14,10 @@ TEST_CONFIG = dict(
 )
 
 
-def create_app(config: dict = {}) -> Flask:
+def create_app(config: dict = None) -> Flask:
+    if not config:
+        config = {}
+
     app = Flask("jetkit_test")
 
     # override config for test app

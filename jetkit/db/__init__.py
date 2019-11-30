@@ -1,6 +1,4 @@
 from sqlalchemy import Column, DateTime, or_, cast, String, Integer, func
-from sqlalchemy.dialects.postgresql import insert as pg_insert
-from typing import List, Any, Dict
 import logging
 from flask_sqlalchemy import SQLAlchemy
 

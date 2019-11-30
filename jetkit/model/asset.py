@@ -107,7 +107,7 @@ class S3Asset(Asset, Upsertable):
             ),
         )
 
-    def object(self):
+    def get_object(self):
         """Get boto3 S3.Object.
 
         https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#object

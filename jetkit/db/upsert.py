@@ -48,8 +48,8 @@ class Upsertable:
             return None
 
         assert res  # we always get a result if the query completes successfully right?
-        id = res.inserted_primary_key[0]
-        result = row_class.query.get(id)
+        inserted_id = res.inserted_primary_key[0]
+        result = row_class.query.get(inserted_id)
         assert result
 
         db.session.expire(result)
