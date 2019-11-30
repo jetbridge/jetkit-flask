@@ -1,5 +1,5 @@
 from jetkit.db.utils import on_table_create
-from jetkit.db import Model, db
+from jetkit.db import Model
 from sqlalchemy.schema import DDL
 
 

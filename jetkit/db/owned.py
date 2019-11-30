@@ -4,6 +4,7 @@ from abc import abstractmethod
 if TYPE_CHECKING:
     import jetkit.model.user
 
+
 class Owned:
     """Protocol for models that have an `owner` user."""
 
