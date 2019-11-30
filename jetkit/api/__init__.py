@@ -80,10 +80,13 @@ def sortable_by(*permitted_columns: Column) -> Callable:
     return decorator
 
 
-def combined_search_by(*columns: Column, search_parameter_name: str = "search") -> Callable:
+def combined_search_by(
+    *columns: Column, search_parameter_name: str = "search"
+) -> Callable:
     """Filters query by filtering on provided columns looking for requested search.
         Wrapped function needs to return sql query.
     """
+
     def decorator(request_handler):
         @wraps(request_handler)
         def wrapper(*args, **kwargs):
