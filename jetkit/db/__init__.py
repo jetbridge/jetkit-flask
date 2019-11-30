@@ -73,3 +73,59 @@ class Upsertable:
         result = db.session.query(row_class).get(id)
         assert result
         return result
+
+
+"""Soft-deleteable query class, for tables with deleted column.
+Soft-delete means marked as deleted rather than actually removed from the DB.
+"""
+
+
+class SoftDeleteableQuery(BaseQuery):
+    """Query that ignores entries that are marked as deleted.
+    Entry is marked as deleted if there is deletion date.
+    """
+
+    def __new__(cls, *args, **kwargs):
+        """Create and return a new query object."""
+        obj = super(SoftDeleteableQuery, cls).__new__(cls)
+        with_deleted = kwargs.pop("_with_deleted", False)
+        if len(args) > 0:
+            super(SoftDeleteableQuery, obj).__init__(*args, **kwargs)
+            return obj.filter_by(deleted=None) if not with_deleted else obj
+        return obj
+
+    def __init__(self, *args, **kwargs):
+        """Empty Init."""
+        pass
+
+    def with_deleted(self):
+        """Include deteled rows in query."""
+        from businessrocket.database import db
+
+        return self.__class__(
+            db.class_mapper(self._mapper_zero().class_),
+            session=db.session(),
+            _with_deleted=True,
+        )
+
+    def _get(self, *args, **kwargs):
+        """Call the original query.get function from the base class."""
+        return super(SoftDeleteableQuery, self).get(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        """Return resource with given id."""
+        # the query.get method does not like it if there is a filter clause
+        # pre-loaded, so we need to implement it using a workaround
+        obj = self.with_deleted()._get(*args, **kwargs)
+        return obj if obj is not None and not obj.deleted else None
+
+
+class SoftDeleteable:
+    """Define the standard column for tables that should support soft delete."""
+
+    query_class = SoftDeleteableQuery
+    deleted = Column(TSTZ, nullable=True)
+
+    def mark_deleted(self):
+        """Mark object as deleted."""
+        self.deleted = func.now()

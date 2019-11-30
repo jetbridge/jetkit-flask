@@ -29,3 +29,8 @@ def test_user_details(client, api_user, db_session, user, admin):
 
     assert user_response.json.get("password") is None
     assert user_response.json.get("_password") is None
+
+    deleted_user_response = client.delete(f"/api/user/{user.id}")
+    assert deleted_user_response.status_code == 200
+    user_not_found_response = client.get(f"/api/user/{user.id}")
+    assert user_not_found_response.status_code == 404
