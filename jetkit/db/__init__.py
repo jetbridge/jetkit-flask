@@ -1,15 +1,36 @@
-from sqlalchemy import DateTime, Integer, func, Column
+from sqlalchemy import Column, DateTime, or_, cast, String, Integer, func
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from typing import List, Any, Dict
 import logging
 from flask_sqlalchemy import SQLAlchemy, BaseQuery
 
+from jetkit.db.utils import escape_like
+
 log = logging.getLogger(__name__)
 TSTZ = DateTime(timezone=True)
 
 
+def get_count(q):
+    # https://gist.github.com/hest/8798884
+    count_q = q.statement.with_only_columns([func.count()]).order_by(None)
+    count = q.session.execute(count_q).scalar()
+    return count
+
+
+class SearchableQuery(BaseQuery):
+    def search(self, search_query: str, *columns: Column):
+        escape_character = "~"
+        search_query = escape_like(search_query, escape_character=escape_character)
+        return self.filter(
+            or_(
+                cast(column, String).ilike(f"%{search_query}%", escape=escape_character)
+                for column in columns
+            )
+        )
+
+
 class BaseModel(object):
-    query: BaseQuery
+    query: SearchableQuery
     id = Column(Integer, primary_key=True)
     created_at = Column(TSTZ, nullable=False, server_default=func.now())
     updated_at = Column(TSTZ, nullable=True, onupdate=func.now())
