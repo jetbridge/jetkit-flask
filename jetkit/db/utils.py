@@ -1,3 +1,8 @@
+from sqlalchemy.event import listen
+from sqlalchemy import Table
+from functools import partial
+
+
 def escape_like(query: str, escape_character: str) -> str:
     """
     Escape special characters that are used in SQL's LIKE and ILIKE.
@@ -18,3 +23,13 @@ def escape_like(query: str, escape_character: str) -> str:
     for case in cases:
         query = query.replace(case, escape_character + case)
     return query
+
+
+def on_table_create(class_, ddl):
+    """Run DDL on model class `class_` after creation, whether in migration or in deploy (as in tests)."""
+
+    def listener(tablename, ddl, table, bind, **kw):
+        if table.name == tablename:
+            ddl(table, bind, **kw)
+
+    listen(Table, "after_create", partial(listener, class_.__table__.name, ddl))

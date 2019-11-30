@@ -1,12 +1,26 @@
 from sqlalchemy import Column, DateTime, or_, cast, String, Integer, func
 import logging
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import (
+    Model as FlaskSQLAModel,
+    SQLAlchemy as FlaskSQLAlchemy,
+    BaseQuery as SQLABaseQuery,
+)
+from aws_xray_sdk.ext.flask_sqlalchemy.query import XRayFlaskSqlAlchemy, XRayBaseQuery
+import os
 
 from jetkit.db.utils import escape_like
 from jetkit.db.query_filter import FilteredQuery
+from jetkit.db.upsert import Upsertable
 
 log = logging.getLogger(__name__)
+
+# recommended to use TIMESTAMP WITH TIMEZONE
 TSTZ = DateTime(timezone=True)
+
+# if we are running with AWS-XRay enabled, use the XRay-enhanced versions of query and SQLA for tracing/profiling of queries
+xray_enabled = os.getenv("XRAY")
+BaseQueryBase = XRayBaseQuery if xray_enabled else SQLABaseQuery
+SQLA = XRayFlaskSqlAlchemy if xray_enabled else FlaskSQLAlchemy
 
 
 class BaseQuery(FilteredQuery):
@@ -31,7 +45,7 @@ class BaseQuery(FilteredQuery):
         return count
 
 
-class BaseModel:
+class BaseModel(FlaskSQLAModel, Upsertable):
     query: BaseQuery
     id = Column(Integer, primary_key=True)
     created_at = Column(TSTZ, nullable=False, server_default=func.now())
@@ -43,6 +57,7 @@ class BaseModel:
             if hasattr(self, attr):
                 setattr(self, attr, value)
 
+# initialize our XRay?FlaskSQLAlchemy instance
 
-db = SQLAlchemy(model_class=BaseModel, query_class=BaseQuery)
+db: FlaskSQLAlchemy = SQLA(model_class=BaseModel, query_class=BaseQuery)
 Model = db.Model
