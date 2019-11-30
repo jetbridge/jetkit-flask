@@ -49,13 +49,11 @@ class FilteredQuery(QueryFilter):
 
     def without_filters(self):
         """Just get raw query without any default filters added."""
-        # FIXME: figure out how to write this without needing `db`
-        from jetkit.db import db
-
+        # get the class of the mapper linked to this query
+        # FIXME: there must be a cleaner way to do this
+        mapper = next(self._mapper_entities).mapper
         return self.__class__(
-            db.class_mapper(self._mapper_zero().class_),
-            session=db.session(),
-            _without_filters=True,
+            mapper.class_, session=self.session, _without_filters=True,
         )
 
     def apply_default_filters(self):

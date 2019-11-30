@@ -1,9 +1,11 @@
 from jetkit.db.utils import on_table_create
-from jetkit.db import Model
+from jetkit.test.app import db
 from sqlalchemy.schema import DDL
 
 
 def test_on_table_create(session):
+    Model = db.Model
+
     class MyTable(Model):
         __tablename__ = "my_table"
 
