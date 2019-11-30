@@ -45,7 +45,7 @@ class BaseModel:
                 setattr(self, attr, value)
 
 
-db = SQLAlchemy(model_class=BaseModel)
+db = SQLAlchemy(model_class=BaseModel, query_class=BaseQuery)
 Model = db.Model
 
 
