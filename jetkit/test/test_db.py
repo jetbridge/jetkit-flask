@@ -29,3 +29,9 @@ def test_on_table_create(session):
     # verify handlers ran
     assert session.query(MyTable).first().id == 42
     assert ran_ddl
+
+
+def test_update_attributes(user):
+    # TODO: test subfield updates
+    user.update(name="fred")
+    assert user.name == "fred"

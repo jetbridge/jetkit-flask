@@ -23,6 +23,7 @@ flask-jwt-extended = "*"
 flask-sqlalchemy = "*"
 themis-docs = "*"
 dataclasses-json = "*"
+aws-xray-sdk = "*"
 
 [dev-packages]
 "flake8" = "*"

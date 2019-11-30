@@ -56,9 +56,9 @@ class BaseModel(FlaskSQLAModel, Upsertable):
         Selectively update object's fields.
 
         Can be nested:
-            school.update(country={"name": "abc"})
+            address.update(country={"name": "abc"})
         ...or as a dict:
-            school.update(**{"country": {"name": "abc"}})
+            address.update(**{"country": {"name": "abc"}})
         """
         self.ensure_valid_attributes(**attributes)
 
@@ -79,8 +79,8 @@ class BaseModel(FlaskSQLAModel, Upsertable):
         :raises: ValueError when attempting to update nested fields of a relationship,
             which is `None` at the moment.
 
-            school.country == None  # True
-            school.update(**{"country": {"name": "abc"}}) # raises ValueError
+            address.country == None  # True
+            address.update(**{"country": {"name": "abc"}}) # raises ValueError
 
         """
         for field, value in attributes.items():
