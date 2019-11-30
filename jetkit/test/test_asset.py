@@ -18,7 +18,7 @@ def test_generate_key(user, session, s3_client):
     # same as above
     asset = Asset.upsert_for_filename(filename="foo.jpg", prefix="dir", owner=user)
 
-    asset.object()
+    asset.get_object()
 
 
 def test_asset_generate_presigned_urls(s3_bucket, asset: Asset):
