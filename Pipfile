@@ -47,6 +47,8 @@ black = "*"
 pytest-mock = "*"
 pytest-mypy = "*"
 moto = "*"
+ipython = "*"
+prompt-toolkit = "==2.0.10"
 
 [requires]
 python_version = "3.7"
