@@ -32,9 +32,9 @@ workflows:
       - type_checks:
           requires:
             - deps
-      - analysis:
-          requires:
-            - deps
+#      - analysis:
+#          requires:
+#            - deps
 
 jobs:
   # git clone
