@@ -116,4 +116,4 @@ jobs:
           key: v2-dep-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           command: |
-            pipenv run bento check
+            pipenv run bento check --email mischa@jetbridge.com
