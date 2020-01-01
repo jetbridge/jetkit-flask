@@ -1,8 +1,7 @@
-from sqlalchemy import Column, or_, cast, String, func
-
-from jetkit.db.query.base import BaseQueryBase
+from jetkit.db.bases import BaseQueryBase
 from jetkit.db.query.filter import FilteredQuery
 from jetkit.db.utils import escape_like
+from sqlalchemy import Column, or_, cast, String, func
 
 
 class BaseQuery(FilteredQuery, BaseQueryBase):

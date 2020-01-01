@@ -4,10 +4,7 @@ from sqlalchemy import Column, DateTime, Integer, func
 import logging
 from flask_sqlalchemy import (
     Model as FlaskSQLAModel,
-    SQLAlchemy as FlaskSQLAlchemy,
 )
-from aws_xray_sdk.ext.flask_sqlalchemy.query import XRayFlaskSqlAlchemy
-import os
 from jetkit.db.upsert import Upsertable
 
 if TYPE_CHECKING:
@@ -17,10 +14,6 @@ log = logging.getLogger(__name__)
 
 # recommended to use TIMESTAMP WITH TIMEZONE for DateTime columns whenever possible
 TSTZ = DateTime(timezone=True)
-
-# if we are running with AWS-XRay enabled, use the XRay-enhanced versions of query and SQLA for tracing/profiling of queries
-xray_enabled = os.getenv("XRAY")
-SQLA = XRayFlaskSqlAlchemy if xray_enabled else FlaskSQLAlchemy
 
 
 class BaseModel(FlaskSQLAModel, Upsertable):

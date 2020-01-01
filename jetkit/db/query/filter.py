@@ -1,5 +1,6 @@
 from typing import Iterable, Type
-from jetkit.db.query.base import BaseQueryBase
+
+from jetkit.db.bases import BaseQueryBase
 
 
 class QueryFilter(BaseQueryBase):
