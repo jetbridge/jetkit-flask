@@ -50,6 +50,7 @@ pytest-mypy = "*"
 moto = "*"
 ipython = "*"
 prompt-toolkit = "==2.0.10"
+bento-cli = "*"
 
 [requires]
 python_version = "3.7"
