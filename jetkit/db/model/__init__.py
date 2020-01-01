@@ -24,7 +24,7 @@ SQLA = XRayFlaskSqlAlchemy if xray_enabled else FlaskSQLAlchemy
 
 
 class BaseModel(FlaskSQLAModel, Upsertable):
-    query: BaseQuery
+    query: "BaseQuery"
     id = Column(Integer, primary_key=True)
     created_at = Column(TSTZ, nullable=False, server_default=func.now())
     updated_at = Column(TSTZ, nullable=True, onupdate=func.now())
