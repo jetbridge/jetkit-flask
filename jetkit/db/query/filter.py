@@ -1,8 +1,8 @@
 from typing import Iterable, Type
-from flask_sqlalchemy import BaseQuery
+from jetkit.db.query.base import BaseQueryBase
 
 
-class QueryFilter(BaseQuery):
+class QueryFilter(BaseQueryBase):
     """Base class for constructing query filters."""
 
     def apply_default_filter(self) -> "QueryFilter":
