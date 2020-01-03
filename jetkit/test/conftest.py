@@ -87,7 +87,7 @@ def app(database):
 @pytest.fixture(scope="session")
 def _db(app):
     """Provide the transactional fixtures with access to the database via a Flask-SQLAlchemy database connection."""
-    from jetkit.db import db
+    from jetkit.test.app import db
 
     # create all tables for test DB
     db.create_all()

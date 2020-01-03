@@ -32,6 +32,9 @@ workflows:
       - type_checks:
           requires:
             - deps
+#      - analysis:
+#          requires:
+#            - deps
 
 jobs:
   # git clone
@@ -102,3 +105,15 @@ jobs:
       - run:
           command: |
             pipenv run flake8
+
+  # bento
+  analysis:
+    executor: py-exec
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          key: v2-dep-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+      - run:
+          command: |
+            pipenv run bento --agree --email mischa@jetbridge.com check

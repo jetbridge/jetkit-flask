@@ -1,7 +1,8 @@
 import pytest
 from flask import Flask
 from flask_jwt_extended import JWTManager
-from jetkit.db import db
+from flask_sqlalchemy import SQLAlchemy
+from jetkit.db import BaseModel, BaseQuery
 
 TEST_CONFIG = dict(
     TESTING=True,
@@ -12,6 +13,8 @@ TEST_CONFIG = dict(
     EMAIL_DOMAIN="jetbridge.com",
     EMAIL_DEFAULT_SENDER="notifications@jetbridge.com",
 )
+
+db = SQLAlchemy(model_class=BaseModel, query_class=BaseQuery)
 
 
 def create_app(config: dict = None) -> Flask:

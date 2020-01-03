@@ -31,7 +31,7 @@ class AuthModel:
     email: str
     password: str
 
-    # assuming for flask-sqlalchemy (for now)
+    # assuming for flask-sqlalchemy
     query: Query
 
     @abstractmethod

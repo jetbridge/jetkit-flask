@@ -1,11 +1,11 @@
 from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
-from jetkit.db import Model
+from jetkit.test.app import db
 from jetkit.model.asset import S3Asset as CoreAsset
 
 
-class Asset(Model, CoreAsset):
+class Asset(db.Model, CoreAsset):
     __tablename__ = "test_asset"
     owner_id = Column(
         Integer,

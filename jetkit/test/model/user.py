@@ -1,10 +1,10 @@
 from sqlalchemy.orm import relationship
 from jetkit.model.user import CoreUser
-from jetkit.db import Model
+from jetkit.test.app import db
 from jetkit.db.soft_deletable import SoftDeletableQuery
 
 
-class User(Model, CoreUser):
+class User(db.Model, CoreUser):
     __tablename__ = "test_user"
     query_class = SoftDeletableQuery
     assets = relationship("jetkit.test.model.asset.Asset", back_populates="owner")

@@ -34,23 +34,26 @@ class Upsertable:
         else:
             raise Exception("constraint or index_elements must be specified")
 
+        # create INSERT ... ON CONFLICT DO UPDATE statement
         insert_query = (
             pg_insert(row_class)
             .on_conflict_do_update(**conflict, set_=set_)
             .values(**values)
         )
 
-        from jetkit.db import db
+        session = row_class.query.session
 
-        res = db.session.execute(insert_query)
+        # execute insert
+        res = session.execute(insert_query)
         if not should_return_result:
             # if we don't care about getting the inserted object, we can stop now
             return None
 
-        assert res  # we always get a result if the query completes successfully right?
+        # retrieve inserted row
+        assert res
         inserted_id = res.inserted_primary_key[0]
+        assert inserted_id
         result = row_class.query.get(inserted_id)
         assert result
-
-        db.session.expire(result)
+        session.expire(result)
         return result

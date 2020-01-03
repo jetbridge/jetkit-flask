@@ -1,6 +1,7 @@
 from enum import Enum, unique
 from jetkit.db import BaseModel
-from jetkit.db.soft_deletable import SoftDeletable, SoftDeletableQuery
+from jetkit.db.query.soft_deletable import SoftDeletableQuery
+from jetkit.db.soft_deletable import SoftDeletable
 from jetkit.db.upsert import Upsertable
 from jetkit.db.extid import ExtID
 from sqlalchemy import Date, Text, Column, Enum as SQLAEnum

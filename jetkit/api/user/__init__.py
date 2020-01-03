@@ -1,7 +1,6 @@
 from flask_jwt_extended import jwt_required
 from flask_rest_api import Blueprint
 from jetkit.model.user import CoreUser as User
-from jetkit.db import db
 from marshmallow import Schema
 from .schema import UserSchema
 from typing import Type
@@ -31,5 +30,5 @@ def CoreUserAPI(user_model: User, user_schema: Type[Schema] = UserSchema):
         """Soft delete user"""
         user = user_model.query.get_or_404(user_id)
         user.mark_deleted()
-        db.session.commit()
+        user_model.query.session.commit()
         return "Ok"
