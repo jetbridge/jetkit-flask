@@ -54,7 +54,6 @@ bento-cli = "*"
 flake8-docstrings = "*"
 pep8-naming = "*"
 flake8-debugger = "*"
-pydocstyle = "*"
 
 [requires]
 python_version = "3.7"
