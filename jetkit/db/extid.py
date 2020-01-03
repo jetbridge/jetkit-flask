@@ -3,10 +3,10 @@ from sqlalchemy import Column, event, text
 from sqlalchemy.exc import DataError
 from sqlalchemy.dialects.postgresql import UUID
 from typing import Optional, TypeVar, Generic, Type
-from jetkit.db import db
+from flask_sqlalchemy import Model
 from sqlalchemy.schema import DDL
 
-T = TypeVar("T", bound=db.Model)
+T = TypeVar("T", bound=Model)
 
 
 class ExtID(Generic[T]):
@@ -25,7 +25,7 @@ class ExtID(Generic[T]):
     )
 
     @classmethod
-    def get_by_extid(cls: Type[db.Model], uuid: str) -> Optional[T]:
+    def get_by_extid(cls: Type[Model], uuid: str) -> Optional[T]:
         try:
             return cls.query.filter_by(extid=uuid).one_or_none()
         except DataError:  # This means that extid is not a valid uuid
