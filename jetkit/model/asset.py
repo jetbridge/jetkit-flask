@@ -97,10 +97,10 @@ class S3Asset(Asset, Upsertable):
     # unique index on bucket/key
     # c.f. https://docs.sqlalchemy.org/en/13/orm/extensions/declarative/mixins.html
     @declared_attr
-    def __table_args__(cls):
+    def __table_args__(self):
         return (
             Index(
-                f"{cls.__tablename__}_asset_s3key_uniq_idx",
+                f"{self.__tablename__}_asset_s3key_uniq_idx",
                 "s3bucket",
                 "s3key",
                 unique=True,

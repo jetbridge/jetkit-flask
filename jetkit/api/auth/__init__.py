@@ -49,7 +49,7 @@ def auth_response_for_user(user: AuthModel) -> dict:
     }
 
 
-def CoreAuthAPI(auth_model: AuthModel, user_schema: Type[Schema] = UserSchema):
+def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSchema):
     class AuthResponse(Schema):
         access_token = f.String(dump_only=True)
         refresh_token = f.String(dump_only=True)
