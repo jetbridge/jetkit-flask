@@ -1,15 +1,19 @@
 from enum import Enum, unique
-
-from flask_rest_api import Api
 from functools import wraps
 
 from sqlalchemy import Column, desc, nullslast
 from typing import Iterable, Callable
 from flask_jwt_extended import jwt_required, current_user
 from flask import request
-from flask_rest_api import abort
+from flask_rest_api import abort, Api, Page
 
 api = Api()
+
+
+class CursorPage(Page):
+    @property
+    def item_count(self):
+        return self.collection.count_no_subquery()
 
 
 def permissions_required(permissions: Iterable) -> Callable:
