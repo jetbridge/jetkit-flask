@@ -14,15 +14,16 @@ from sqlalchemy.sql.schema import Column, ForeignKey
 from sqlalchemy.sql.sqltypes import Integer, Text
 
 import jetkit.aws.s3 as s3
-from jetkit.db import BaseModel, Upsertable
-from jetkit.model.ext_id import ExtID
+from jetkit.db import BaseModel
+from jetkit.db.upsert import Upsertable
+from jetkit.db.extid import ExtID
 
 log = logging.getLogger(__name__)
 
 SLUGIFY_S3_KEY = re.compile(r"[^A-Za-z0-9!\-/_.*'()]")
 
 
-class Asset(BaseModel, ExtID):
+class Asset(BaseModel, ExtID["Asset"]):
     """Keep a record of files that are stored somewhere.
 
     You should use S3Asset if you are using S3.
@@ -106,7 +107,7 @@ class S3Asset(Asset, Upsertable):
             ),
         )
 
-    def object(self):
+    def get_object(self):
         """Get boto3 S3.Object.
 
         https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#object
@@ -132,7 +133,7 @@ class S3Asset(Asset, Upsertable):
     @classmethod
     def upsert(cls, s3key: str, **kwargs) -> "S3Asset":
         # add defaults for region, bucket if not present
-        return super().upsert_row(
+        row = super().upsert_row(
             row_class=cls,
             index_elements=["s3bucket", "s3key"],
             values=dict(
@@ -142,6 +143,8 @@ class S3Asset(Asset, Upsertable):
                 **kwargs,
             ),
         )
+        assert row
+        return row
 
     @classmethod
     def upsert_for_filename(

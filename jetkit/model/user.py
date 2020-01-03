@@ -1,5 +1,8 @@
 from enum import Enum, unique
-from jetkit.db import Upsertable, BaseModel
+from jetkit.db import BaseModel
+from jetkit.db.soft_deletable import SoftDeletable, SoftDeletableQuery
+from jetkit.db.upsert import Upsertable
+from jetkit.db.extid import ExtID
 from sqlalchemy import Date, Text, Column, Enum as SQLAEnum
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -13,8 +16,13 @@ class CoreUserType(Enum):
     admin = "admin"
 
 
-class CoreUser(BaseModel, Upsertable):
+class CoreUserQuery(SoftDeletableQuery):
+    pass
+
+
+class CoreUser(BaseModel, Upsertable, SoftDeletable, ExtID["CoreUser"]):
     __has_assets__ = False  # set to true to enable assets
+    query_class = CoreUserQuery
 
     # polymorphism
     _user_type = Column(
