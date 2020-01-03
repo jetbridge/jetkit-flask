@@ -4,7 +4,7 @@ from jetkit.test.app import db
 from jetkit.db.soft_deletable import SoftDeletableQuery
 
 
-class User(db.Model, CoreUser):
+class User(db.Model, CoreUser):  # type: ignore
     __tablename__ = "test_user"
     query_class = SoftDeletableQuery
     assets = relationship("jetkit.test.model.asset.Asset", back_populates="owner")
