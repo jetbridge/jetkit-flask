@@ -19,6 +19,6 @@ def is_in_aws() -> bool:
 
 
 def get_session():
-    """Get boto3 session. """
+    """Get boto3 session."""
     session = boto3.session.Session()
     return session

@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 NAME = "JetKit-Flask"
 DESCRIPTION = "Rapid web application development."
-VERSION = "7.0.0"
+VERSION = "7.0.1"
 REQUIRES_PYTHON = ">=3.6.0"
 
 setup(

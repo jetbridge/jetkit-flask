@@ -8,7 +8,7 @@ from typing import Type
 blp = Blueprint("Users", __name__, url_prefix="/api/user")
 
 
-def CoreUserAPI(user_model: User, user_schema: Type[Schema] = UserSchema):
+def use_core_user_api(user_model: User, user_schema: Type[Schema] = UserSchema):
     @blp.route("")
     @blp.response(user_schema(many=True))
     # TODO: protect with @permissions_required
@@ -20,14 +20,14 @@ def CoreUserAPI(user_model: User, user_schema: Type[Schema] = UserSchema):
     @blp.response(user_schema)
     @jwt_required
     def get_user(user_id: int) -> User:
-        """Get user details"""
+        """Get user details."""
         user = user_model.query.get_or_404(user_id)
         return user
 
     @blp.route("<int:user_id>", methods=["DELETE"])
     @jwt_required
     def delete_user(user_id: int) -> str:
-        """Soft delete user"""
+        """Soft delete user."""
         user = user_model.query.get_or_404(user_id)
         user.mark_deleted()
         user_model.query.session.commit()

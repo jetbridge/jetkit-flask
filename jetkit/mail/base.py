@@ -9,7 +9,6 @@ MailClient = TypeVar("MailClient", bound="MailClientBase")
 class MailClientBase(ABC):
     """Base mail client, allowing sending of emails via a standard interface.
 
-
     Can be used like this
 
     ::

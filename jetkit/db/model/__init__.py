@@ -2,9 +2,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import Column, DateTime, Integer, func
 import logging
-from flask_sqlalchemy import (
-    Model as FlaskSQLAModel,
-)
+from flask_sqlalchemy import Model as FlaskSQLAModel
 from jetkit.db.upsert import Upsertable
 
 if TYPE_CHECKING:
@@ -24,7 +22,7 @@ class BaseModel(FlaskSQLAModel, Upsertable):
 
     def update(self, **attributes):
         """
-        Selectively update object's fields.
+        Update object's fields selectively.
 
         Can be nested:
             address.update(country={"name": "abc"})
