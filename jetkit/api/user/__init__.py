@@ -1,5 +1,5 @@
 from flask_jwt_extended import jwt_required
-from flask_rest_api import Blueprint
+from flask_smorest import Blueprint
 from jetkit.model.user import CoreUser as User
 from marshmallow import Schema
 from .schema import UserSchema

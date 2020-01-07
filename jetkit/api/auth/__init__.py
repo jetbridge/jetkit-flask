@@ -1,4 +1,4 @@
-from flask_rest_api import Blueprint, abort
+from flask_smorest import Blueprint, abort
 from marshmallow import fields as f, Schema
 from flask_jwt_extended import (
     jwt_required,

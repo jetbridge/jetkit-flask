@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 NAME = "JetKit-Flask"
 DESCRIPTION = "Rapid web application development."
-VERSION = "7.0.1"
+VERSION = "8.0.0"
 REQUIRES_PYTHON = ">=3.6.0"
 
 setup(
@@ -33,7 +33,7 @@ setup(
         "flask-jwt-extended",
         "flask-sqlalchemy",
         "marshmallow-sqlalchemy",
-        "flask-rest-api",
+        "flask-smorest",
         "Flask-Cors",
         "marshmallow-enum",
         "marshmallow",

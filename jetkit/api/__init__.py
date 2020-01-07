@@ -5,7 +5,7 @@ from sqlalchemy import Column, desc, nullslast
 from typing import Iterable, Callable
 from flask_jwt_extended import jwt_required, current_user
 from flask import request
-from flask_rest_api import abort, Api, Page
+from flask_smorest import abort, Api, Page
 
 api = Api()
 
