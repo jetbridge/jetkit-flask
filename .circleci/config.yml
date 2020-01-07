@@ -32,9 +32,9 @@ workflows:
       - type_checks:
           requires:
             - deps
-#      - analysis:
-#          requires:
-#            - deps
+      - analysis:
+          requires:
+            - deps
 
 jobs:
   # git clone
@@ -116,4 +116,4 @@ jobs:
           key: v2-dep-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           command: |
-            pipenv run bento --agree --email mischa@jetbridge.com check
+            pipenv run bento --agree --email mischa@jetbridge.com check --no-pager
