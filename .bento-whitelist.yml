@@ -2,26 +2,26 @@ r2c.bandit:
   violations: {}
 r2c.flake8:
   violations:
-    127634d6a8774e3027fd2d024aa23287:
+    1e161a9740612230d2d4f2a8dee6e6c4:
       check_id: A003
       message: '"id" is a python builtin, consider renaming the class attribute'
       path: jetkit/db/model/__init__.py
       severity: 2
       syntactic_context: '    id = Column(Integer, primary_key=True)'
       tool_id: r2c.flake8
-    53a8e0b2be56d4de0e10daa1d1b40bc7:
-      check_id: A003
-      message: '"id" is a python builtin, consider renaming the class attribute'
-      path: jetkit/api/user/schema.py
-      severity: 2
-      syntactic_context: '    id = f.Integer()'
-      tool_id: r2c.flake8
-    66d34169d968126565313d94be4d8013:
+    3adf161c0c0b91a5824e78c13bfe71b7:
       check_id: A003
       message: '"id" is a python builtin, consider renaming the class attribute'
       path: jetkit/db/owned.py
       severity: 2
       syntactic_context: '    @property'
+      tool_id: r2c.flake8
+    527f0536897656da2ffd2793297b0f9d:
+      check_id: A003
+      message: '"id" is a python builtin, consider renaming the class attribute'
+      path: jetkit/api/user/schema.py
+      severity: 2
+      syntactic_context: '    id = f.Integer()'
       tool_id: r2c.flake8
 r2c.flask:
   violations: {}
