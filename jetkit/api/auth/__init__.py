@@ -1,4 +1,4 @@
-from flask_rest_api import Blueprint, abort
+from flask_smorest import Blueprint, abort
 from marshmallow import fields as f, Schema
 from flask_jwt_extended import (
     jwt_required,
@@ -49,7 +49,7 @@ def auth_response_for_user(user: AuthModel) -> dict:
     }
 
 
-def CoreAuthAPI(auth_model: AuthModel, user_schema: Type[Schema] = UserSchema):
+def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSchema):
     class AuthResponse(Schema):
         access_token = f.String(dump_only=True)
         refresh_token = f.String(dump_only=True)

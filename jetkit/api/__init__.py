@@ -5,7 +5,7 @@ from sqlalchemy import Column, desc, nullslast
 from typing import Iterable, Callable
 from flask_jwt_extended import jwt_required, current_user
 from flask import request
-from flask_rest_api import abort, Api, Page
+from flask_smorest import abort, Api, Page
 
 api = Api()
 
@@ -18,7 +18,8 @@ class CursorPage(Page):
 
 def permissions_required(permissions: Iterable) -> Callable:
     """
-    Use this as a decorator to functions that require user permissions control
+    Decorate functions that require user permissions control.
+
     Pass permissions as a list of UserType enum values
     """
 
@@ -42,7 +43,8 @@ class SortOrder(Enum):
 
 
 def sortable_by(*permitted_columns: Column) -> Callable:
-    """Allows to sort result of api call.
+    """Permit sorting result of api call.
+
     Wrapped function needs to return sql query.
     """
     permitted_columns_by_name = {column.name: column for column in permitted_columns}
@@ -87,8 +89,9 @@ def sortable_by(*permitted_columns: Column) -> Callable:
 def combined_search_by(
     *columns: Column, search_parameter_name: str = "search"
 ) -> Callable:
-    """Filters query by filtering on provided columns looking for requested search.
-        Wrapped function needs to return sql query.
+    """Filter query by filtering on provided columns looking for requested search.
+
+    Wrapped function needs to return sql query.
     """
 
     def decorator(request_handler):
@@ -116,8 +119,9 @@ def searchable_by(
     autoname=True,
     autoname_prefix="search_",
 ) -> Callable:
-    """Filters query by filtering on provided columns looking for requested search.
-       Wrapped function needs to return sql query.
+    """Filter query by filtering on provided columns looking for requested search.
+
+    Wrapped function needs to return sql query.
     """
     fallback_parameter_name = autoname_prefix + column.key if autoname else "search"
     search_parameter_name = search_parameter_name or fallback_parameter_name

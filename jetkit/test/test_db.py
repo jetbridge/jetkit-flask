@@ -4,9 +4,9 @@ from sqlalchemy.schema import DDL
 
 
 def test_on_table_create(session):
-    Model = db.Model
+    model_cls = db.Model
 
-    class MyTable(Model):
+    class MyTable(model_cls):
         __tablename__ = "my_table"
 
     ran_ddl = False
@@ -20,9 +20,9 @@ def test_on_table_create(session):
     on_table_create(MyTable, DDL("INSERT INTO my_table (id) VALUES (42); COMMIT"))
 
     # create table
-    Model.metadata.create_all(
+    model_cls.metadata.create_all(
         session.connection().engine,
-        [Model.metadata.tables["my_table"]],
+        [model_cls.metadata.tables["my_table"]],
         checkfirst=True,
     )
 

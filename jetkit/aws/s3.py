@@ -18,9 +18,10 @@ class S3PresignedUpload:
 
 @enum.unique
 class ACL(enum.Enum):
-    """Who can view this asset.
+    """Define who can view this asset.
 
-    Set on S3 object."""
+    Set on S3 object.
+    """
 
     private = "private"
     public_read = "public-read"

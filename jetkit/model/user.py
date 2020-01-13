@@ -40,9 +40,9 @@ class CoreUser(BaseModel, Upsertable, SoftDeletable, ExtID["CoreUser"]):
     _password = Column(Text())
 
     @declared_attr
-    def assets(cls):
+    def assets(self):
         """Add asset relationship if it's been enabled."""
-        if not cls.__has_assets__:
+        if not self.__has_assets__:
             return
         return relationship("Asset", back_populates="createdby")
 
