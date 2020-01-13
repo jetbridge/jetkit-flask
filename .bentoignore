@@ -31,3 +31,5 @@
 .gitignore
 .git/
 :include .gitignore
+
+.venv
