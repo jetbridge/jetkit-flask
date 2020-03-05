@@ -92,7 +92,7 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
         new_user = User.upsert_row(
             auth_model,
             values=values,
-            index_elements=("id", "extid")
+            index_elements=["id"]
         )
         auth_model.query.session.commit()
         return new_user
