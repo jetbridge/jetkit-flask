@@ -64,7 +64,7 @@ def test_token_refreshing(client, user, api_auth):
     assert response.status_code == 200
 
 
-def test_sign_up(client_unauthenticated, api_auth, client, db_session):
+def test_sign_up(client_unauthenticated, api_auth, client):
     test_email = "testsignup@gmail.com"
     test_password = "testo"
     sign_up_response = client_unauthenticated.post(
