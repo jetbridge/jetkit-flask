@@ -12,6 +12,7 @@ from sqlalchemy.orm import Query
 from jetkit.api.user.schema import UserSchema
 from typing import Type
 from jetkit.model.user import CoreUser as User
+from jetkit.model.user import NormalUser as NUser
 from ...model.user import CoreUserType
 from werkzeug.security import generate_password_hash
 
@@ -78,13 +79,10 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
         existing_user: AuthModel = auth_model.query.filter_by(email=cleaned_email).one_or_none()
         if existing_user:
             abort(400, message="There's already a registered user with this email")
-        values = dict(email=email, _password=generate_password_hash(password), _user_type=CoreUserType.normal.value)
-        new_user = User.upsert_row(
-            auth_model,
-            values=values,
-            index_elements=["id"]
-        )
-        auth_model.query.session.commit()
+        new_user = auth_model(email=email, password=password)
+        session = auth_model.query.session
+        session.add(new_user)
+        session.commit()
         return new_user
 
     @blp.route("check", methods=["GET"])
