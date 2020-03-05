@@ -60,10 +60,11 @@ def create_app(config: dict = None) -> Flask:
 
 @pytest.fixture()
 def api_auth(app):
-    from jetkit.api.auth import blp, use_core_auth_api
+    from jetkit.api.auth import blp, use_core_auth_api, use_sign_up_api
     from jetkit.test.model.user import User
 
     use_core_auth_api(auth_model=User)
+    use_sign_up_api(auth_model=User)
     app.register_blueprint(blp)
 
 

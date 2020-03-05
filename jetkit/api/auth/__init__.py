@@ -1,5 +1,6 @@
-from flask_smorest import Blueprint, abort
-from marshmallow import fields as f, Schema
+from abc import abstractmethod
+from typing import Type
+
 from flask_jwt_extended import (
     jwt_required,
     jwt_refresh_token_required,
@@ -7,16 +8,17 @@ from flask_jwt_extended import (
     create_refresh_token,
     get_current_user,
 )
-from abc import abstractmethod
+from flask_smorest import Blueprint, abort
+from marshmallow import fields as f, Schema
 from sqlalchemy.orm import Query
+
 from jetkit.api.user.schema import UserSchema
-from typing import Type
 
 blp = Blueprint("Authentication", __name__, url_prefix="/api/auth")
 
 
 # default schemas
-class LoginRequest(Schema):
+class AuthRequest(Schema):
     password = f.String(required=True, allow_none=False)
     email = f.String(required=True, allow_none=False)
 
@@ -57,7 +59,7 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
 
     @blp.route("login", methods=["POST"])
     @blp.response(AuthResponse)
-    @blp.arguments(LoginRequest, as_kwargs=True)
+    @blp.arguments(AuthRequest, as_kwargs=True)
     def login(email: str, password: str):
         """Login with email + password."""
         cleaned_email = email.strip().lower()
@@ -78,3 +80,21 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
     def refresh_token():
         current_user = get_current_user()
         return {"access_token": create_access_token(identity=current_user)}
+
+
+def use_sign_up_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSchema):
+    # Since sign up can require not only email/password, seperate this from core auth api
+    @blp.route("sign-up", methods=["POST"])
+    @blp.response(user_schema)
+    @blp.arguments(AuthRequest, as_kwargs=True)
+    def sign_up(email: str, password: str):
+        """Sign up with email and password. Possibly add other fields later."""
+        cleaned_email = email.strip().lower()
+        existing_user: AuthModel = auth_model.query.filter_by(email=cleaned_email).one_or_none()
+        if existing_user:
+            abort(400, message="There's already a registered user with this email")
+        new_user = auth_model(email=email, password=password)
+        session = auth_model.query.session
+        session.add(new_user)
+        session.commit()
+        return new_user

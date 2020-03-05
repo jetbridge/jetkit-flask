@@ -62,3 +62,30 @@ def test_token_refreshing(client, user, api_auth):
         environ_base={"HTTP_AUTHORIZATION": f"Bearer {correct_refresh_token}"},
     )
     assert response.status_code == 200
+
+
+def test_sign_up(client_unauthenticated, api_auth, client):
+    test_email = "testsignup@gmail.com"
+    test_password = "testo"
+    sign_up_response = client_unauthenticated.post(
+        "/api/auth/sign-up", json=dict(email=test_email, password=test_password)
+    )
+    assert sign_up_response.status_code == 200
+    assert sign_up_response.json['email'] == test_email
+
+    log_in_response = client_unauthenticated.post(
+        "/api/auth/login", json=dict(email=test_email, password=test_password)
+    )
+
+    assert log_in_response.status_code == 200
+    assert log_in_response.json["access_token"] is not None
+    assert log_in_response.json["refresh_token"] is not None
+    assert log_in_response.json["user"].get("id") is not None
+
+    sign_up_response = client_unauthenticated.post(
+        "/api/auth/sign-up", json=dict(email=test_email, password=test_password)
+    )
+
+    assert not sign_up_response == 200
+
+

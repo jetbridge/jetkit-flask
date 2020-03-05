@@ -39,6 +39,7 @@ class CoreUser(BaseModel, Upsertable, SoftDeletable, ExtID["CoreUser"]):
     phone_number = Column(Text())
     _password = Column(Text())
 
+
     @declared_attr
     def assets(self):
         """Add asset relationship if it's been enabled."""
