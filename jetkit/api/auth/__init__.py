@@ -93,7 +93,7 @@ def use_sign_up_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSchem
         existing_user: AuthModel = auth_model.query.filter_by(email=cleaned_email).one_or_none()
         if existing_user:
             abort(400, message="There's already a registered user with this email")
-        new_user = auth_model(email=email, password=password) # type: ignore
+        new_user = auth_model(email=email, password=password)  # type: ignore
         session = auth_model.query.session
         session.add(new_user)
         session.commit()
