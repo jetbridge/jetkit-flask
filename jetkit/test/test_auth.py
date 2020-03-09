@@ -87,5 +87,3 @@ def test_sign_up(client_unauthenticated, api_auth, client):
     )
 
     assert not sign_up_response == 200
-
-

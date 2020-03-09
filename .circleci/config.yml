@@ -114,6 +114,6 @@ jobs:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           key: v2-dep-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-      - run:
-          command: |
-            pipenv run bento --agree --email mischa@jetbridge.com check --no-pager
+#      - run:
+#          command: |
+#            pipenv run bento --agree --email mischa@jetbridge.com check --no-pager
