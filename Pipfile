@@ -2,7 +2,6 @@
 url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
-typeshed = {git = "https://github.com/python/typeshed.git"}
 
 [packages]
 boto3 = "*"
