@@ -93,14 +93,16 @@ def test_sign_up(client_unauthenticated, api_auth, client):
 def test_validate_email():
     test_email = "me@mail.com"
 
-    assert validate_email(test_email, allowed_domains=None, allowed_emails=None)
-    assert validate_email(test_email, ["mail.com"], None)
+    assert validate_email(test_email, allowed_domains=["mail.com"], allowed_emails=None)
     assert validate_email(test_email, None, ["me@mail.com"])
     assert validate_email(test_email, ["mail.com"], ["me@mail.com"])
     assert validate_email(test_email, ["jetbridge.com"], ["me@mail.com"])
     assert validate_email(test_email, ["mail.com", "another.com"], ["other@other.com"])
     assert validate_email(test_email, None, ["someothermail@gmail.com", "me@mail.com"])
 
+    assert (
+        validate_email(test_email, allowed_domains=None, allowed_emails=None) is False
+    )
     assert validate_email(test_email, ["me@otherdomain.com"], None) is False
     assert (
         validate_email(test_email, ["me@otherdomain.com", "another@dom.ain"], None)

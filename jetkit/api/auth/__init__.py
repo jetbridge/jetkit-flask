@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List, Optional, Type
+from typing import List, Optional, Type, Union
 
 from email_normalize import normalize
 from flask_jwt_extended import (
@@ -85,22 +85,25 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
 
 def validate_email(
         email: str,
-        allowed_domains: Optional[List[str]] = None,
-        allowed_emails: Optional[List[str]] = None,
+        allowed_domains: Union[str, Optional[List[str]]],
+        allowed_emails: Optional[List[str]],
 ) -> bool:
     """
     Validate if the email has the allowed domain or in the list of allowed emails.
 
     :param email:
-    :param allowed_domains: list of allowed domains. `None` means allow all domains. Empty list means disallowing all domains
-    :param allowed_emails: list of allowed emails
+    :param allowed_domains: list of allowed domains. `*` means allow all domains.
+    :param allowed_emails: list of allowed emails.
     :return:
     """
     if allowed_emails and email in allowed_emails:
         return True
 
-    if allowed_domains is None:  # no restrictions
+    if allowed_domains == "*":  # no restrictions
         return True
+
+    if not allowed_domains:
+        return False
 
     domain = email[email.index("@") + 1:]
     return domain in allowed_domains
@@ -109,7 +112,7 @@ def validate_email(
 def use_sign_up_api(
         auth_model: AuthModel,
         user_schema: Type[Schema] = UserSchema,
-        allowed_domains: Optional[List] = None,
+        allowed_domains: Union[str, Optional[List[str]]] = "*",
         allowed_emails: Optional[List] = None,
 ):
     # Since sign up can require not only email/password, separate this from core auth api
