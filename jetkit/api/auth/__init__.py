@@ -84,11 +84,12 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
 
 
 def validate_email(
-    email: str,
-    allowed_domains: Optional[List[str]] = None,
-    allowed_emails: Optional[List[str]] = None,
+        email: str,
+        allowed_domains: Optional[List[str]] = None,
+        allowed_emails: Optional[List[str]] = None,
 ) -> bool:
     """
+    Validate if the email has the allowed domain or in the list of allowed emails.
 
     :param email:
     :param allowed_domains: list of allowed domains. `None` means allow all domains. Empty list means disallowing all domains
@@ -101,15 +102,15 @@ def validate_email(
     if allowed_domains is None:  # no restrictions
         return True
 
-    domain = email[email.index("@") + 1 :]
+    domain = email[email.index("@") + 1:]
     return domain in allowed_domains
 
 
 def use_sign_up_api(
-    auth_model: AuthModel,
-    user_schema: Type[Schema] = UserSchema,
-    allowed_domains: Optional[List] = None,
-    allowed_emails: Optional[List] = None,
+        auth_model: AuthModel,
+        user_schema: Type[Schema] = UserSchema,
+        allowed_domains: Optional[List] = None,
+        allowed_emails: Optional[List] = None,
 ):
     # Since sign up can require not only email/password, separate this from core auth api
     @blp.route("sign-up", methods=["POST"])

@@ -90,18 +90,6 @@ def test_sign_up(client_unauthenticated, api_auth, client):
     assert not sign_up_response == 200
 
 
-def test_sign_up_with_unallowed_domain(app, client_unauthenticated, api_auth, client):
-    app.config['ALLOWED_AUTH_DOMAINS'] = ['jetbridge.com']
-    app.config['ALLOWED_AUTH_EMAILS'] = []
-
-    test_email = "testsignup@gmail.com"
-    test_password = "testo"
-    sign_up_response = client_unauthenticated.post(
-        "/api/auth/sign-up", json=dict(email=test_email, password=test_password)
-    )
-    assert sign_up_response.status_code == 403
-
-
 def test_validate_email():
     test_email = "me@mail.com"
 
