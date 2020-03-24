@@ -91,8 +91,8 @@ def validate_email(
     """
 
     :param email:
-    :param allowed_domains: list of allowed domains. `None` means allow all domains
-    :param allowed_emails: list of allowed emails. `None` means allow all emails
+    :param allowed_domains: list of allowed domains. `None` means allow all domains. Empty list means disallowing all domains
+    :param allowed_emails: list of allowed emails
     :return:
     """
     if allowed_emails and email in allowed_emails:
