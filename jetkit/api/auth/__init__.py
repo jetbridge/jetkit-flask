@@ -1,14 +1,14 @@
 from abc import abstractmethod
-from typing import Type
+from typing import List, Optional, Type
 
 from flask_jwt_extended import (
-    jwt_required,
-    jwt_refresh_token_required,
     create_access_token,
     create_refresh_token,
     get_current_user,
+    jwt_refresh_token_required,
+    jwt_required,
 )
-from flask_smorest import Blueprint, abort
+from flask_smorest import abort, Blueprint
 from marshmallow import fields as f, Schema
 from sqlalchemy.orm import Query
 
@@ -82,15 +82,29 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
         return {"access_token": create_access_token(identity=current_user)}
 
 
-def use_sign_up_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSchema):
-    # Since sign up can require not only email/password, seperate this from core auth api
+def use_sign_up_api(
+        auth_model: AuthModel,
+        user_schema: Type[Schema] = UserSchema,
+        allowed_domains: Optional[List] = None,
+        allowed_emails: Optional[List] = None,
+):
+    # Since sign up can require not only email/password, separate this from core auth api
     @blp.route("sign-up", methods=["POST"])
     @blp.response(user_schema)
     @blp.arguments(AuthRequest, as_kwargs=True)
     def sign_up(email: str, password: str):
         """Sign up with email and password. Possibly add other fields later."""
         cleaned_email = email.strip().lower()
-        existing_user: AuthModel = auth_model.query.filter_by(email=cleaned_email).one_or_none()
+
+        domain = email[email.index('@') + 1:]
+        allowed_by_domain = domain in allowed_domains
+        allowed_by_email = email in allowed_emails
+        if not allowed_by_domain and not allowed_by_email:
+            abort(403, message="Domain or email is not allowed")
+
+        existing_user: AuthModel = auth_model.query.filter_by(
+            email=cleaned_email
+        ).one_or_none()
         if existing_user:
             abort(400, message="There's already a registered user with this email")
         new_user = auth_model(email=email, password=password)  # type: ignore

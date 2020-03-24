@@ -71,7 +71,7 @@ def test_sign_up(client_unauthenticated, api_auth, client):
         "/api/auth/sign-up", json=dict(email=test_email, password=test_password)
     )
     assert sign_up_response.status_code == 200
-    assert sign_up_response.json['email'] == test_email
+    assert sign_up_response.json["email"] == test_email
 
     log_in_response = client_unauthenticated.post(
         "/api/auth/login", json=dict(email=test_email, password=test_password)
