@@ -1,5 +1,6 @@
 from flask_jwt_extended import create_refresh_token, get_jwt_identity
 from .conftest import password as correct_password
+from jetkit.api.auth import validate_email
 
 incorrect_password = "wrong-password"
 
@@ -65,7 +66,7 @@ def test_token_refreshing(client, user, api_auth):
 
 
 def test_sign_up(client_unauthenticated, api_auth, client):
-    test_email = "testsignup@gmail.com"
+    test_email = "testsignup@jetbridge.com"
     test_password = "testo"
     sign_up_response = client_unauthenticated.post(
         "/api/auth/sign-up", json=dict(email=test_email, password=test_password)
@@ -87,3 +88,34 @@ def test_sign_up(client_unauthenticated, api_auth, client):
     )
 
     assert not sign_up_response == 200
+
+
+def test_sign_up_with_unallowed_domain(app, client_unauthenticated, api_auth, client):
+    app.config['ALLOWED_AUTH_DOMAINS'] = ['jetbridge.com']
+    app.config['ALLOWED_AUTH_EMAILS'] = []
+
+    test_email = "testsignup@gmail.com"
+    test_password = "testo"
+    sign_up_response = client_unauthenticated.post(
+        "/api/auth/sign-up", json=dict(email=test_email, password=test_password)
+    )
+    assert sign_up_response.status_code == 403
+
+
+def test_validate_email():
+    test_email = "me@mail.com"
+
+    assert validate_email(test_email, allowed_domains=None, allowed_emails=None)
+    assert validate_email(test_email, ["mail.com"], None)
+    assert validate_email(test_email, None, ['me@mail.com'])
+    assert validate_email(test_email, ['mail.com'], ['me@mail.com'])
+    assert validate_email(test_email, ['jetbridge.com'], ['me@mail.com'])
+    assert validate_email(test_email, ['mail.com', 'another.com'], ['other@other.com'])
+    assert validate_email(test_email, None, ['someothermail@gmail.com', 'me@mail.com'])
+
+    assert validate_email(test_email, ['me@otherdomain.com'], None) is False
+    assert validate_email(test_email, ['me@otherdomain.com', 'another@dom.ain'], None) is False
+    assert validate_email(test_email, ['me@otherdomain.com'], ['other@email.com']) is False
+    assert validate_email(test_email, [], []) is False
+    assert validate_email(test_email, [], ['another@email.com']) is False
+    assert validate_email(test_email, ['other.com'], []) is False

@@ -82,6 +82,25 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
         return {"access_token": create_access_token(identity=current_user)}
 
 
+def validate_email(email: str, allowed_domains: Optional[List[str]] = None,
+                   allowed_emails: Optional[List[str]] = None) -> bool:
+    """
+
+    :param email:
+    :param allowed_domains: list of allowed domains. `None` means allow all domains
+    :param allowed_emails: list of allowed emails. `None` means allow all emails
+    :return:
+    """
+    if allowed_emails and email in allowed_emails:
+        return True
+
+    if allowed_domains is None:  # no restrictions
+        return True
+
+    domain = email[email.index('@') + 1:]
+    return domain in allowed_domains
+
+
 def use_sign_up_api(
         auth_model: AuthModel,
         user_schema: Type[Schema] = UserSchema,
@@ -96,10 +115,8 @@ def use_sign_up_api(
         """Sign up with email and password. Possibly add other fields later."""
         cleaned_email = email.strip().lower()
 
-        domain = email[email.index('@') + 1:]
-        allowed_by_domain = domain in allowed_domains
-        allowed_by_email = email in allowed_emails
-        if not allowed_by_domain and not allowed_by_email:
+        allowed = validate_email(email, allowed_domains, allowed_emails)
+        if not allowed:
             abort(403, message="Domain or email is not allowed")
 
         existing_user: AuthModel = auth_model.query.filter_by(
