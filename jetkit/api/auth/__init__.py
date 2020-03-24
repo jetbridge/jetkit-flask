@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from typing import List, Optional, Type
 
+from email_normalize import normalize
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -82,8 +83,11 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
         return {"access_token": create_access_token(identity=current_user)}
 
 
-def validate_email(email: str, allowed_domains: Optional[List[str]] = None,
-                   allowed_emails: Optional[List[str]] = None) -> bool:
+def validate_email(
+    email: str,
+    allowed_domains: Optional[List[str]] = None,
+    allowed_emails: Optional[List[str]] = None,
+) -> bool:
     """
 
     :param email:
@@ -97,15 +101,15 @@ def validate_email(email: str, allowed_domains: Optional[List[str]] = None,
     if allowed_domains is None:  # no restrictions
         return True
 
-    domain = email[email.index('@') + 1:]
+    domain = email[email.index("@") + 1 :]
     return domain in allowed_domains
 
 
 def use_sign_up_api(
-        auth_model: AuthModel,
-        user_schema: Type[Schema] = UserSchema,
-        allowed_domains: Optional[List] = None,
-        allowed_emails: Optional[List] = None,
+    auth_model: AuthModel,
+    user_schema: Type[Schema] = UserSchema,
+    allowed_domains: Optional[List] = None,
+    allowed_emails: Optional[List] = None,
 ):
     # Since sign up can require not only email/password, separate this from core auth api
     @blp.route("sign-up", methods=["POST"])
@@ -113,7 +117,7 @@ def use_sign_up_api(
     @blp.arguments(AuthRequest, as_kwargs=True)
     def sign_up(email: str, password: str):
         """Sign up with email and password. Possibly add other fields later."""
-        cleaned_email = email.strip().lower()
+        cleaned_email = normalize(email.strip().lower())
 
         allowed = validate_email(email, allowed_domains, allowed_emails)
         if not allowed:
