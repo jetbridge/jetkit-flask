@@ -85,7 +85,7 @@ def use_core_auth_api(auth_model: AuthModel, user_schema: Type[Schema] = UserSch
 
 def validate_email(
         email: str,
-        allowed_domains: Union[str, Optional[List[str]]],
+        allowed_domains: Optional[Union[str, List[str]]],
         allowed_emails: Optional[List[str]],
 ) -> bool:
     """
@@ -112,7 +112,7 @@ def validate_email(
 def use_sign_up_api(
         auth_model: AuthModel,
         user_schema: Type[Schema] = UserSchema,
-        allowed_domains: Union[str, Optional[List[str]]] = "*",
+        allowed_domains: Optional[Union[str, List[str]]] = "*",
         allowed_emails: Optional[List] = None,
 ):
     # Since sign up can require not only email/password, separate this from core auth api
