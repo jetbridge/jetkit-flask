@@ -1,5 +1,7 @@
 from flask_jwt_extended import create_refresh_token, get_jwt_identity
 from .conftest import password as correct_password
+from jetkit.api.auth import validate_email
+import pytest
 
 incorrect_password = "wrong-password"
 
@@ -64,14 +66,14 @@ def test_token_refreshing(client, user, api_auth):
     assert response.status_code == 200
 
 
-def test_sign_up(client_unauthenticated, api_auth, client):
-    test_email = "testsignup@gmail.com"
+def test_sign_up(client_unauthenticated, app, api_auth, client):
+    test_email = "testsignup@jetbridge.com"
     test_password = "testo"
     sign_up_response = client_unauthenticated.post(
         "/api/auth/sign-up", json=dict(email=test_email, password=test_password)
     )
     assert sign_up_response.status_code == 200
-    assert sign_up_response.json['email'] == test_email
+    assert sign_up_response.json["email"] == test_email
 
     log_in_response = client_unauthenticated.post(
         "/api/auth/login", json=dict(email=test_email, password=test_password)
@@ -87,3 +89,26 @@ def test_sign_up(client_unauthenticated, api_auth, client):
     )
 
     assert not sign_up_response == 200
+
+
+@pytest.mark.parametrize(
+    "test_email,allowed_domains,allowed_emails,expected",
+    [
+        ("me@mail.com", ["jetbridge.com"], None, False),
+        ("me@mail.com", ["mail.com"], None, True),
+        ("me@mail.com", None, ["me@mail.com"], True),
+        ("me@mail.com", ["mail.com"], ["me@mail.com"], True),
+        ("me@mail.com", ["jetbridge.com"], ["me@mail.com"], True),
+        ("me@mail.com", ["mail.com", "another.com"], ["other@other.com"], True),
+        ("me@mail.com", None, ["someothermail@gmail.com", "me@mail.com"], True),
+        ("me@mail.com", None, None, False),
+        ("me@mail.com", ["me@otherdomain.com"], None, False),
+        ("me@mail.com", ["me@otherdomain.com", "another@dom.ain"], None, False),
+        ("me@mail.com", ["me@otherdomain.com"], ["other@email.com"], False),
+        ("me@mail.com", [], [], False),
+        ("me@mail.com", [], ["another@email.com"], False),
+        ("me@mail.com", ["other.com"], [], False),
+    ],
+)
+def test_validate_email(test_email, allowed_domains, allowed_emails, expected):
+    assert validate_email(test_email, allowed_domains, allowed_emails) == expected

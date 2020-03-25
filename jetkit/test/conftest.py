@@ -59,6 +59,7 @@ TEST_APP_CONFIG = dict(
     SQLALCHEMY_DATABASE_URI=DB_CONN,
     AWS_S3_BUCKET_NAME="test-bucket",
     SQLALCHEMY_ECHO=bool(os.getenv("SQL_ECHO")),
+    ALLOWED_AUTH_DOMAINS=["jetbridge.com"],
 )
 
 

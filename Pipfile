@@ -25,6 +25,7 @@ flask-sqlalchemy = "*"
 themis-docs = "*"
 dataclasses-json = "*"
 aws-xray-sdk = "*"
+email-normalize = "*"
 
 [dev-packages]
 flake8 = "*"
