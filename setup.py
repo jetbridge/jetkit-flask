@@ -5,7 +5,7 @@ with open("README.md") as f:
 
 NAME = "JetKit-Flask"
 DESCRIPTION = "Rapid web application development."
-VERSION = "8.0.0"
+VERSION = "8.1.0"
 REQUIRES_PYTHON = ">=3.6.0"
 
 setup(
@@ -13,7 +13,7 @@ setup(
     version=VERSION,
     python_requires=REQUIRES_PYTHON,
     url="https://github.com/jetbridge/jetkit-flask",
-    license="ABRMS",
+    license="MIT",
     author="JetBridge",
     author_email="mischa@jetbridge.com",
     description=DESCRIPTION,
