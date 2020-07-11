@@ -60,7 +60,7 @@ class Upsertable:
         if (
             not should_return_result
             or on_conflict is OnConflictBehavior.ON_CONFLICT_DO_NOTHING
-        ):
+        ):  # noqa: W503
             # if we don't care about getting the inserted object, we can stop now
             # if DO NOTHING then we don't get an inserted_pk
             return None
