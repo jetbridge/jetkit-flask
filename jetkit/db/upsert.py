@@ -57,10 +57,8 @@ class Upsertable:
 
         # execute insert
         res = session.execute(insert_query)
-        if (
-            not should_return_result
-            or on_conflict is OnConflictBehavior.ON_CONFLICT_DO_NOTHING
-        ):  # noqa: W503
+        is_do_nothing = on_conflict is OnConflictBehavior.ON_CONFLICT_DO_NOTHING
+        if not should_return_result or is_do_nothing:
             # if we don't care about getting the inserted object, we can stop now
             # if DO NOTHING then we don't get an inserted_pk
             return None
