@@ -32,7 +32,6 @@ jobs:
       - name: "Test: pytest"
         run: pytest
         env:
-          PIPENV_VENV_IN_PROJECT: true
           TEST_DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=disable
           POSTGRES_USER: postgres
           POSTGRES_DB: circle
