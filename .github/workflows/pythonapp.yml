@@ -1,0 +1,37 @@
+name: Build and test
+
+on: [push]
+
+jobs:
+  Formatting:
+    runs-on: ubuntu-latest
+    name: Check Formatting
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Lint: Flake8"
+        uses: cclauss/GitHub-Action-for-Flake8@v0.5.0
+      - name: "Type checks: mypy"
+        uses: jpetrucciani/mypy-check@master
+
+  Build-Test:
+    runs-on: ubuntu-latest
+    name: Build and Test
+    steps:
+      - uses: actions/checkout@v2
+      # environment
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - uses: harmon758/postgresql-action@v1
+        with:
+          postgresql version: "11.5-alpine"
+      - uses: dschep/install-poetry-action@v1.3
+      - name: "Install dependencies"
+        run: poetry install -n --no-ansi
+      - name: "Test: pytest"
+        run: pytest
+        env:
+          TEST_DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=disable
+          POSTGRES_USER: postgres
+          POSTGRES_DB: circle
